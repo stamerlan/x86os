@@ -31,9 +31,13 @@ symb:	all
 bochs:	img symb
 	$(BOCHS) -f $(BOCHSCONF) -q
 
+docs:	doxyfile
+	doxygen doxyfile
+
 backup:	clean
 	cd .. && tar -cvzf x86os-backup.tar.gz x86os
 
 clean:
 	rm -f $(IMG) System.map
+	rm -rf docs/
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
