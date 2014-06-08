@@ -1,6 +1,7 @@
 /*!
  * \file log.h
  * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+ * \todo add function description
  */
 
 #ifndef LOG_H

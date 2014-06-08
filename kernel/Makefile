@@ -4,9 +4,8 @@
 OBJS=\
 	startup.o \
 	kernel.o \
-	gdt.o \
 	log.o \
-	kmalloc.o
+	mm.o 
 
 OUT=../disk/boot/kernel
 

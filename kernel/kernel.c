@@ -1,19 +1,19 @@
 /*!
  * \file kernel.c
  * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+ * \todo add doxygen
  */
 
-#include "gdt.h"
 #include "log.h"
-#include "io.h"
+#include "mm.h"
 
 void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
 {
+	mm_init();
+
 	log_init();
 	log_printf("x86os starting:\n\n");
-
-	seg_init();
 
 	int a, d;
 

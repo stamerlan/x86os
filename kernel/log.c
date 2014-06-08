@@ -10,10 +10,10 @@
 #define LOG_WIDTH	80
 #define LOG_HEIGHT	25
 
-#include <stddef.h>
 #include <stdarg.h>
+#include "types.h"
 #include "log.h"
-#include "io.h"
+#include "asm.h"
 
 static unsigned char xpos = 0;
 static unsigned char ypos = 0;
@@ -77,11 +77,11 @@ static void log_newline()
  */
 static void log_move_cursor()
 {
-	unsigned short pos = ypos * LOG_WIDTH + xpos;
-	outpb(0x3d4, 14);
-	outpb(0x3d5, pos >> 8);
-	outpb(0x3d4, 15);
-	outpb(0x3d5, pos);
+	uint16_t pos = ypos * LOG_WIDTH + xpos;
+	outb(0x3d4, 14);
+	outb(0x3d5, pos >> 8);
+	outb(0x3d4, 15);
+	outb(0x3d5, pos);
 }
 
 /*!
