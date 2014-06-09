@@ -1,7 +1,7 @@
 /*!
  * \file mm.c
  * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \brief memory manager
+ * \details memory manager. Creates GDT and PDE,setups pagging
  */
 
 #include "mm.h"

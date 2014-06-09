@@ -1,7 +1,7 @@
 /*!
  * \file log.c
  * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \brief logging module
+ * \details logging module
  * \todo use bochs 0xE9 port for output
  * \todo use ring buffer for messages
  * \todo remove any console output

@@ -15,21 +15,22 @@
 #define SEG_UCODE	3
 #define SEG_UDATA	4
 
+/// \todo add fields description
 /// Segment descriptor
 struct segdesc_t
 {
 	uint32_t lim_15_0 : 16;
 	uint32_t base_15_0 : 16;
 	uint32_t base_23_16 : 8;
-	uint32_t type : 4;		// See STS_ constants
-	uint32_t s : 1;			// 0 = sys, 1 = app
+	uint32_t type : 4;		/// \sa STA
+	uint32_t s : 1;			/// 0 = sys, 1 = app
 	uint32_t dpl : 2;
-	uint32_t p : 1;			// present
+	uint32_t p : 1;			/// present
 	uint32_t lim_19_16 : 4;
-	uint32_t avl : 1;		// unused
-	uint32_t rsv : 1;		// reserved
-	uint32_t db : 1;		// 0 = 16-bit seg, 1 = 32-bit srg
-	uint32_t g : 1;			// granularity
+	uint32_t avl : 1;		/// unused
+	uint32_t rsv : 1;		/// reserved
+	uint32_t db : 1;		/// 0 = 16-bit seg, 1 = 32-bit seg
+	uint32_t g : 1;			/// granularity
 	uint32_t base_31_24 : 8;
 };
 
@@ -40,17 +41,21 @@ struct segdesc_t
 	((uint32_t)(base) >> 16) & 0xFF, (type), 1, (dpl), 1,	\
 	(uint32_t)(lim) >> 28, 0, 0, 1, 1, (uint32_t)(base) >> 24 }
 
+/// \todo add grouping
+/// \defgroup STA @{
 /// Application segment type bits
-#define STA_X	0x8	// executable
-#define STA_E	0x4	// expand down (non-exec seg)
-#define STA_C	0x4	// conforming code segment (exec seg)
-#define STA_W	0x2	// writeable (non-exec seg)
-#define STA_R	0x2	// eeadable (exec seg)
-#define STA_A	0x1	// accessed
+#define STA_X	0x8	/// executable
+#define STA_E	0x4	/// expand down (non-exec seg)
+#define STA_C	0x4	/// conforming code segment (exec seg)
+#define STA_W	0x2	/// writeable (non-exec seg)
+#define STA_R	0x2	/// eeadable (exec seg)
+#define STA_A	0x1	/// accessed
+/// @}
 
-/// DPL
+/// \defgroup DPL @{
 #define	DPL_SYS	0
 #define DPL_USR	3
+/// @}
 
 /// PAGE SIZE
 #define PAGE_SZ	0x1000

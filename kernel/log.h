@@ -7,6 +7,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+/// \see log.c:log_init()
 void log_init();
 void log_clear();
 void log_putc(char c);

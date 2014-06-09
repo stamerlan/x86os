@@ -1,12 +1,20 @@
 /*!
  * \file kernel.c
  * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \todo add doxygen
+ * \details initializes memory manager and logging module
  */
 
 #include "log.h"
 #include "mm.h"
 
+/*!
+ * \breif kernel entry point
+ * \param magic - magic value
+ * \param mbi - multiboot information
+ * \sa https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
+ * \note arguments get from startup code
+ * \note no return
+ */
 void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
 {
