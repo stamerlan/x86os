@@ -21,7 +21,7 @@ static char *video = (char *)0xb8000;
 
 /*!
  * \breif log init
- * \detailed reads cursor pos from bios mem
+ * \details reads cursor pos from bios mem
  *
  * \note Should be called before any log operations
  */
@@ -33,10 +33,8 @@ void log_init()
 
 /*!
  * \breif clear log
- * \detailed fills all video memory with '\0'
- *
+ * \details fills all video memory with '\0'
  * \note log should be init
- *
  * \see log_init()
  */
 void log_clear()
@@ -48,8 +46,7 @@ void log_clear()
 
 /*!
  * \brief inserts new line to log
- * \detailed setups xpos, ypos, scrolles screen if necessary, sets cursor pos
- *
+ * \details setups xpos, ypos, scrolles screen if necessary, sets cursor pos
  * \note log should be init
  */
 static void log_newline()
@@ -72,7 +69,6 @@ static void log_newline()
 
 /*!
  * \brief moves cursor to pos xpos, ypos
- *
  * \note xpos and ypos should be set
  */
 static void log_move_cursor()
@@ -86,13 +82,9 @@ static void log_move_cursor()
 
 /*!
  * \brief put char
- * \detailed copy char to video ram, text attribute = 7, sets cursor pos,
- * moves cursor
- *
- * \note log should be init
- *
+ * \details copy char to video ram, text attribute = 7, moves cursor
  * \param c - char to print (recognized special chars: \n, \t)
- *
+ * \note log should be init
  * \see log_init
  */
 void log_putc(char c)
@@ -121,11 +113,9 @@ void log_putc(char c)
 
 /*!
  * \brief print string to log
- * 
+ * \details uses log_putc() in loop
  * \param s - pointer to ASCIIZ string
- *
  * \note log should be init
- *
  * \see log_init
  */
 void log_puts(char *s)
@@ -139,11 +129,9 @@ void log_puts(char *s)
 
 /*!
  * \brief format and print string to log
- *
+ * \details supported formats: %d, %u, %x, %s, %c
  * \param fmt - format string
- * 
  * \note log should be init
- *
  * \see log_init
  */
 void log_printf(char *fmt, ...)

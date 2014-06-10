@@ -19,48 +19,55 @@
 /// Segment descriptor
 struct segdesc_t
 {
-	uint32_t lim_15_0 : 16;
-	uint32_t base_15_0 : 16;
-	uint32_t base_23_16 : 8;
-	uint32_t type : 4;		/// \sa STA
-	uint32_t s : 1;			/// 0 = sys, 1 = app
-	uint32_t dpl : 2;
-	uint32_t p : 1;			/// present
-	uint32_t lim_19_16 : 4;
-	uint32_t avl : 1;		/// unused
-	uint32_t rsv : 1;		/// reserved
-	uint32_t db : 1;		/// 0 = 16-bit seg, 1 = 32-bit seg
-	uint32_t g : 1;			/// granularity
-	uint32_t base_31_24 : 8;
+	uint32_t lim_15_0 : 16;		///< low bits of seg limit
+	uint32_t base_15_0 : 16;	///< low bits of seg base addr
+	uint32_t base_23_16 : 8;	///< middle bits of seg base addr
+	/*!
+	 * \enum seg_type
+	 * Segment type bits
+	 */
+	enum seg_type
+	{
+		STA_X	= 0x8,		///< app executable
+		STA_E	= 0x4,		///< app expand down (non-exec seg)
+		STA_C	= 0x4,		///< app conforming code seg (exec seg)
+		STA_W	= 0x2,		///< app writeable (non-exec seg)
+		STA_R	= 0x2,		///< app readable (exec seg)
+		STA_A	= 0x1,		///< app accessed
+	} type : 4;
+	uint32_t s : 1;			///< 0 = sys, 1 = app
+	/*!
+	 * \enum seg_dpl
+	 * Descriptor Privilege Level
+	 */
+	enum seg_dpl
+	{
+		DPL_SYS	= 0,		///< System segment
+		DPL_USR = 3,		///< User segment
+	} dpl : 2;
+	uint32_t p : 1;			///< present
+	uint32_t lim_19_16 : 4;		///< high bits of seg limit
+	uint32_t avl : 1;		///< unused
+	uint32_t rsv : 1;		///< reserved
+	uint32_t db : 1;		///< 0 = 16-bit seg, 1 = 32-bit seg
+	uint32_t g : 1;			///< granularity
+	uint32_t base_31_24 : 8;	///< high bits of seg base addr
 };
 
 /// Setup 32-bit segment descriptor macro
-/// \todo maybe choose g bit from lim value?
+/// \todo choose g bit value from lim value?
 #define SEG(type, base, lim, dpl) (struct segdesc_t) { 		\
        	((lim) >> 12) & 0xFFFF, (uint32_t)(base) & 0xFFFF,	\
 	((uint32_t)(base) >> 16) & 0xFF, (type), 1, (dpl), 1,	\
 	(uint32_t)(lim) >> 28, 0, 0, 1, 1, (uint32_t)(base) >> 24 }
 
-/// \todo add grouping
-/// \defgroup STA @{
-/// Application segment type bits
-#define STA_X	0x8	/// executable
-#define STA_E	0x4	/// expand down (non-exec seg)
-#define STA_C	0x4	/// conforming code segment (exec seg)
-#define STA_W	0x2	/// writeable (non-exec seg)
-#define STA_R	0x2	/// eeadable (exec seg)
-#define STA_A	0x1	/// accessed
-/// @}
-
-/// \defgroup DPL @{
-#define	DPL_SYS	0
-#define DPL_USR	3
-/// @}
-
 /// PAGE SIZE
 #define PAGE_SZ	0x1000
 
-/// Page Directory Entry
+/*!
+ * \struct pde_t
+ * \breif Page Directory Entry
+ */
 struct pde_t
 {
 	uint32_t p : 1;		// present
@@ -80,7 +87,10 @@ struct pde_t
 #define PDE(PTE_adr) (struct pde_t) { \
 	1, 1, 1, 0, 0, 0, 0, 0, 0, 0, (uint32_t)(PTE_adr) >> 12 }
 
-/// Page Table Entry
+/*!
+ * \struct pte_t
+ * \breif Page Table Entry
+ */
 struct pte_t
 {
 	uint32_t p : 1;		// present
