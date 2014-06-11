@@ -15,7 +15,6 @@
 #define SEG_UCODE	3
 #define SEG_UDATA	4
 
-/// \todo add fields description
 /// Segment descriptor
 struct segdesc_t
 {
@@ -55,7 +54,6 @@ struct segdesc_t
 };
 
 /// Setup 32-bit segment descriptor macro
-/// \todo choose g bit value from lim value?
 #define SEG(type, base, lim, dpl) (struct segdesc_t) { 		\
        	((lim) >> 12) & 0xFFFF, (uint32_t)(base) & 0xFFFF,	\
 	((uint32_t)(base) >> 16) & 0xFF, (type), 1, (dpl), 1,	\

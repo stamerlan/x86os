@@ -5,7 +5,8 @@ OBJS=\
 	startup.o \
 	kernel.o \
 	log.o \
-	mm.o 
+	mm.o \
+	i8259.o
 
 OUT=../disk/boot/kernel
 
