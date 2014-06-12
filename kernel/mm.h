@@ -15,7 +15,10 @@
 #define SEG_UCODE	3
 #define SEG_UDATA	4
 
-/// Segment descriptor
+/*!
+ * \struct segdesc_t
+ * \breif Segment descriptor
+ */
 struct segdesc_t
 {
 	uint32_t lim_15_0 : 16;		///< low bits of seg limit
@@ -35,15 +38,7 @@ struct segdesc_t
 		STA_A	= 0x1,		///< app accessed
 	} type : 4;
 	uint32_t s : 1;			///< 0 = sys, 1 = app
-	/*!
-	 * \enum seg_dpl
-	 * Descriptor Privilege Level
-	 */
-	enum seg_dpl
-	{
-		DPL_SYS	= 0,		///< System segment
-		DPL_USR = 3,		///< User segment
-	} dpl : 2;
+	enum dpl_t dpl : 2;		///< descriptor privilege level
 	uint32_t p : 1;			///< present
 	uint32_t lim_19_16 : 4;		///< high bits of seg limit
 	uint32_t avl : 1;		///< unused

@@ -8,7 +8,7 @@ SUBDIRS=\
 IMG=disk.img
 
 MAKE=make
-QEMU=qemu
+QEMU=qemu-system-i386
 CPU_NR=1
 RAM_SZ=32
 QEMUOPTS=-smp $(CPU_NR) -m $(RAM_SZ)
@@ -22,13 +22,13 @@ img:	all
 	sudo ./mkdisk.sh $(IMG)
 	sudo chown `id -u`:`id -g` $(IMG)
 
-qemu:	img
+qemu:	all img
 	$(QEMU) $(QEMUOPTS) -hda $(IMG)
 
 symb:	all
 	nm disk/boot/kernel | cut -f 1,3 -d ' ' > System.map
 
-bochs:	img symb
+bochs:	all img symb
 	$(BOCHS) -f $(BOCHSCONF) -q
 
 docs:	doxyfile

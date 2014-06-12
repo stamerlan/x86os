@@ -15,5 +15,16 @@ typedef unsigned char	uint8_t;
 
 typedef uint32_t	size_t;		/// type contains size in bytes of smth
 
+
+/*!
+ * \enum dpl_t
+ * Descriptor Privilege Level
+ */
+enum dpl_t
+{
+	DPL_SYS	= 0,		///< System segment
+	DPL_USR = 3,		///< User segment
+};
+
 #endif /* TYPES_H */
 

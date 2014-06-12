@@ -7,6 +7,8 @@
 #include "log.h"
 #include "mm.h"
 #include "i8259.h" 
+#include "trap.h"
+#include "asm.h"
 
 /*!
  * \breif kernel entry point
@@ -24,14 +26,11 @@ void kmain(long magic, void *mbi)
 	log_init();
 	log_printf("x86os starting:\n\n");
 
-	int a, d;
-
-	asm volatile ("cpuid" : "=a"(a), "=d"(d) : "0"(0x80000001) : "ebx", "ecx");	
-
-	log_printf("cpuid: edx = 0x%x\n", d);
-
-
 	pic_init();
+	idt_init();
+	pic_enable(IRQ_TIMER);
+
+	sti();
 
 	for(;;);
 }

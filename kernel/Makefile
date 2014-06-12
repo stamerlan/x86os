@@ -6,7 +6,10 @@ OBJS=\
 	kernel.o \
 	log.o \
 	mm.o \
-	i8259.o
+	i8259.o \
+	vectors.o \
+	trap.o \
+	trapasm.o
 
 OUT=../disk/boot/kernel
 
@@ -21,6 +24,9 @@ LDFLAGS=-m elf_i386
 
 all:	$(OBJS)
 	$(LD) $(LDFLAGS) -Ttext 0x100000 -o $(OUT) $(OBJS)
+
+vectors.S:	vectors.pl
+	perl vectors.pl > vectors.S
 
 clean:
 	rm -f $(OBJS) $(OUT)

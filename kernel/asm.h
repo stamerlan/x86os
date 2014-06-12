@@ -9,6 +9,7 @@
 
 #include "types.h"
 #include "mm.h"
+#include "trap.h"
 
 /*!
  * \brief read byte from port
@@ -56,6 +57,41 @@ static inline void lgdt(struct segdesc_t* d, size_t sz)
 	gdtr.pgdt = (uint32_t)d;
 
 	asm volatile("lgdt (%0)" : : "r"(&gdtr));
+}
+
+/*!
+ * \breif setup IDTR
+ * \param d - pointer to IDT
+ * \param sz - size of IDT
+ * \note always inline
+ */
+static void lidt(struct gatedesc_t* d, size_t sz) 
+	__attribute__((always_inline));
+static inline void lidt(struct gatedesc_t* d, size_t sz)
+{
+	struct
+	{
+		uint16_t size;
+		uint32_t pidt;
+	} __attribute__((packed)) idtr;
+	idtr.size = sz - 1;
+	idtr.pidt = (uint32_t)d;
+
+	asm volatile("lidt (%0)" : : "r"(&idtr));
+}
+
+/// \todo add description
+static void cli() __attribute__((always_inline));
+static inline void cli()
+{
+	asm volatile("cli");
+}
+
+/// \todo add description
+static void sti() __attribute__((always_inline));
+static inline void sti()
+{
+	asm volatile("sti");
 }
 
 /// Setup code segment selector

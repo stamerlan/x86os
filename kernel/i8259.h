@@ -21,8 +21,13 @@
 /// IRQ 0 corresponds to int T_IRQ
 #define T_IRQ0		0x20
 
+/// \todo add descr
+#define IRQ_TIMER	0
+#define IRQ_KBD		1
+
 /// \todo add description
 void pic_init();
+void pic_enable(int irq);
 
 #endif /* I8259_H */
 
