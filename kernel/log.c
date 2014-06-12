@@ -17,6 +17,7 @@
 
 static unsigned char xpos = 0;
 static unsigned char ypos = 0;
+/// \todo use define instead
 static char *video = (char *)0xb8000;
 
 /*!

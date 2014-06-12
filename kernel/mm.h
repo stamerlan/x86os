@@ -106,6 +106,8 @@ struct pte_t
 
 /// \todo add description
 void mm_init();
+void *kmalloc(size_t sz);
+void *kpagealloc(size_t pages);
 
 #endif /* MM_H */
 

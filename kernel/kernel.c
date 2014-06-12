@@ -30,7 +30,13 @@ void kmain(long magic, void *mbi)
 	idt_init();
 	pic_enable(IRQ_TIMER);
 
-	sti();
+	log_printf("mm: kpagealloc(1): 0x%x\n", kpagealloc(1));
+	log_printf("mm: kmalloc(10): 0x%x\n", kmalloc(10));
+	log_printf("mm: kmalloc(1): 0x%x\n", kmalloc(1));
+	log_printf("mm: kpagealloc(2): 0x%x\n", kpagealloc(2));
+	log_printf("mm: kmalloc(1): 0x%x\n", kmalloc(1));
+
+	//sti();
 
 	for(;;);
 }
