@@ -22,8 +22,10 @@ void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
 {
 	mm_init();
+	log_putc('s');
 
 	log_init();
+	log_putc('a');
 	log_printf("x86os starting:\n\n");
 
 	pic_init();

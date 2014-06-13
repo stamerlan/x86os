@@ -108,6 +108,8 @@ struct pte_t
 void mm_init();
 void *kmalloc(size_t sz);
 void *kpagealloc(size_t pages);
+struct pde_t *setupvm();
+void kmap(struct pde_t *pde, char *phys, char *virt);
 
 #endif /* MM_H */
 
