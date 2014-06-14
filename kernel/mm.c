@@ -7,12 +7,22 @@
 #include "mm.h"
 #include "asm.h"
 #include "log.h"
+#include "x86.h"
+#include "proc.h"
+#include "config.h"
 
 static struct segdesc_t gdt[NR_SEGS];
+static struct taskstate_t ts;
+static struct context_t *kcontext;
+/// \todo make static
+struct pde_t *kpde; 
+
+void swtch(struct context_t **old, struct context_t *new);
+
 static char *free = (char*)0x200000;
 const char *max_mem = (char*)0x2000000;	// 32 MB
 
-static struct pde_t *kpde; 
+extern struct proc_t *proc_list;
 
 void mm_init()
 {
@@ -20,7 +30,7 @@ void mm_init()
 	gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_SYS);
 	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xFFFFFFFF, DPL_SYS);
 	gdt[SEG_UCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_USR);
-	gdt[SEG_UCODE] = SEG(STA_W, 0, 0xFFFFFFFF, DPL_USR);
+	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xFFFFFFFF, DPL_USR);
 
 	lgdt(gdt, sizeof(gdt));
 	set_cs(SEG_KCODE << 3);
@@ -33,10 +43,10 @@ void mm_init()
 	kpde = setupvm();
 
 	uint32_t cr3 = (uint32_t)(kpde) & (~0xFFF);
-	write_cr3(cr3);
-	uint32_t cr0 = read_cr0();
-	cr0 |= 0x80000000;
-	write_cr0(cr0);
+	wcr3(cr3);
+	uint32_t cr0 = rcr0();
+	cr0 |= CR0_PG;
+	wcr0(cr0);
 
 	/// \todo REMOVE ME. A test: map 0x1ff000 to 0xb8000
 	kmap(kpde, (char*)0xb8000, (char*)0x1ff000);
@@ -61,6 +71,7 @@ void *kmalloc(size_t sz)
 	void *addr = free;
 	free += sz;
 
+	log_printf("debug: kmalloc(sz=%d) = 0x%x\n", sz, (uint32_t)addr);
 	return addr;
 }
 
@@ -76,6 +87,9 @@ void *kpagealloc(size_t pages)
 	}
 
 	free = new_free + (pages * PAGE_SZ);
+
+	log_printf("debug: kpagealloc(pages = %d) = 0x%x\n", pages, 
+			(uint32_t)new_free);
 	return new_free;
 }
 
@@ -88,6 +102,8 @@ struct pde_t *setupvm()
 	struct pde_t *pde = kpagealloc(1);
 	struct pte_t *pte = kpagealloc(1024);
 
+	log_printf("debug: setupvm(): pde = 0x%x, pte = 0x%x\n",
+			(uint32_t)pde, (uint32_t)pte);
 
 	for (i = 0; i < 1024; i++)
 	{
@@ -105,4 +121,39 @@ void kmap(struct pde_t *pde, char *phys, char *virt)
 {
 	struct pte_t *pte = (struct pte_t*)(pde->pte << 12);
 	pte[(uint32_t)virt >> 12] = PTE(phys);
+}
+
+static void switchvm(struct proc_t *p)
+{
+	cli();
+	gdt[SEG_TSS] = SEG16(STS_T32A, &ts,
+			sizeof(struct taskstate_t), DPL_SYS);
+	gdt[SEG_TSS].s = 0;
+	ts.ss0 = SEG_KDATA << 3;
+	ts.esp0 = (uint32_t)p->kstack + KSTACK_SZ;
+	ltr(SEG_TSS << 3);
+	wcr3((uint32_t)p->pgdir);
+	sti();
+}
+
+void sched()
+{
+	for(;;)
+	{
+		sti();
+
+		struct proc_t *p;
+		for(p = proc_list; p != NULL; p = p->next)
+		{
+			if (p->state != RUNNABLE)
+				continue;
+
+			switchvm(p);
+			p->state = RUNNING;
+			swtch(&kcontext, p->context);
+
+			// return to kernel?
+			asm volatile("int $3");
+		}
+	}
 }

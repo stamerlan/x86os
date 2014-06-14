@@ -119,8 +119,8 @@ static inline void sti()
  * \retval CR0 value
  * \note always inline
  */
-static uint32_t read_cr0() __attribute__((always_inline));
-static inline uint32_t read_cr0()
+static uint32_t rcr0() __attribute__((always_inline));
+static inline uint32_t rcr0()
 {
 	uint32_t cr0;
 	asm volatile("mov %%cr0, %0" : "=r"(cr0));
@@ -132,8 +132,8 @@ static inline uint32_t read_cr0()
  * \param cr0 - new CR0 value
  * \note always inline
  */
-static void write_cr0(uint32_t cr0) __attribute__((always_inline));
-static inline void write_cr0(uint32_t cr0)
+static void wcr0(uint32_t cr0) __attribute__((always_inline));
+static inline void wcr0(uint32_t cr0)
 {
 	asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
@@ -143,10 +143,21 @@ static inline void write_cr0(uint32_t cr0)
  * \param cr3 - new CR3 value
  * \note always inline
  */
-static void write_cr3(uint32_t cr3) __attribute__((always_inline));
-static inline void write_cr3(uint32_t cr3)
+static void wcr3(uint32_t cr3) __attribute__((always_inline));
+static inline void wcr3(uint32_t cr3)
 {
 	asm volatile("mov %0, %%cr3" :: "r"(cr3));
+}
+
+/*!
+ * \breif Load task register
+ * \param sel - selector
+ * \note always inline
+ */
+static void ltr(uint16_t sel) __attribute__((always_inline));
+static inline void ltr(uint16_t sel)
+{
+	asm volatile("ltr %0" :: "r"(sel));
 }
 
 #endif /* ASM_H */

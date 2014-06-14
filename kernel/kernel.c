@@ -9,7 +9,9 @@
 #include "i8259.h" 
 #include "trap.h"
 #include "asm.h"
+#include "proc.h"
 
+extern struct pde_t *kpde;
 /*!
  * \breif kernel entry point
  * \param magic - magic value
@@ -21,24 +23,19 @@
 void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
 {
-	mm_init();
-	log_putc('s');
-
+	/// \todo move after mm_init
 	log_init();
-	log_putc('a');
+	mm_init();
+
 	log_printf("x86os starting:\n\n");
+
+	log_printf("debug: kmain(): kernel pde = 0x%x\n", (uint32_t)kpde);
 
 	pic_init();
 	idt_init();
-	pic_enable(IRQ_TIMER);
 
-	log_printf("mm: kpagealloc(1): 0x%x\n", kpagealloc(1));
-	log_printf("mm: kmalloc(10): 0x%x\n", kmalloc(10));
-	log_printf("mm: kmalloc(1): 0x%x\n", kmalloc(1));
-	log_printf("mm: kpagealloc(2): 0x%x\n", kpagealloc(2));
-	log_printf("mm: kmalloc(1): 0x%x\n", kmalloc(1));
-
-	//sti();
+	userinit();
+	sched();
 
 	for(;;);
 }

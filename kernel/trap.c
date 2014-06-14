@@ -80,9 +80,6 @@ void trap(struct trapframe_t* tf)
 	case T_SIMDERR:
 		log_printf("SIMD floating point\n");
 		break;
-	case T_IRQ0 + IRQ_TIMER:
-		log_printf("timer int\n");
-		break;
 	case T_SYSCALL:
 		log_printf("syscall\n");
 		break;

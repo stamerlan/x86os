@@ -9,11 +9,12 @@
 #include "types.h"
 
 /// Segments numbers
-#define NR_SEGS		5
+#define NR_SEGS		6
 #define	SEG_KCODE	1
 #define SEG_KDATA	2
 #define SEG_UCODE	3
 #define SEG_UDATA	4
+#define SEG_TSS		5
 
 /*!
  * \struct segdesc_t
@@ -36,6 +37,8 @@ struct segdesc_t
 		STA_W	= 0x2,		///< app writeable (non-exec seg)
 		STA_R	= 0x2,		///< app readable (exec seg)
 		STA_A	= 0x1,		///< app accessed
+	
+		STS_T32A = 0x9,		///< sys avl 32-bit TSS seg
 	} type : 4;
 	uint32_t s : 1;			///< 0 = sys, 1 = app
 	enum dpl_t dpl : 2;		///< descriptor privilege level
@@ -48,11 +51,16 @@ struct segdesc_t
 	uint32_t base_31_24 : 8;	///< high bits of seg base addr
 };
 
-/// Setup 32-bit segment descriptor macro
+/// Setup 32-bit segment descriptor
 #define SEG(type, base, lim, dpl) (struct segdesc_t) { 		\
        	((lim) >> 12) & 0xFFFF, (uint32_t)(base) & 0xFFFF,	\
 	((uint32_t)(base) >> 16) & 0xFF, (type), 1, (dpl), 1,	\
 	(uint32_t)(lim) >> 28, 0, 0, 1, 1, (uint32_t)(base) >> 24 }
+/// Setup 16-bit segment descriptor
+#define SEG16(type, base, lim, dpl) (struct segdesc_t) {	\
+	(lim) & 0xFFFF, (uint32_t)(base) & 0xFFFF,		\
+	((uint32_t)(base) >> 16) & 0xFF, (type), 1, (dpl), 1,	\
+	(uint32_t)(lim) >> 16, 0, 0, 1, 0, (uint32_t)(base) >> 24 }
 
 /// PAGE SIZE
 #define PAGE_SZ	0x1000
@@ -110,6 +118,7 @@ void *kmalloc(size_t sz);
 void *kpagealloc(size_t pages);
 struct pde_t *setupvm();
 void kmap(struct pde_t *pde, char *phys, char *virt);
+void sched();
 
 #endif /* MM_H */
 

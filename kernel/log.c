@@ -5,6 +5,7 @@
  * \todo use bochs 0xE9 port for output
  * \todo use ring buffer for messages
  * \todo remove any console output
+ * \todo looks like smth with console scrolling
  */
 
 #define LOG_WIDTH	80

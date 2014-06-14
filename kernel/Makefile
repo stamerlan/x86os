@@ -9,7 +9,10 @@ OBJS=\
 	i8259.o \
 	vectors.o \
 	trap.o \
-	trapasm.o
+	trapasm.o \
+	string.o \
+	proc.o \
+	swtch.o
 
 OUT=../disk/boot/kernel
 
