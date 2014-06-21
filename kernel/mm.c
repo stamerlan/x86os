@@ -48,6 +48,7 @@ void mm_init()
 	cr0 |= CR0_PG;
 	wcr0(cr0);
 
+	/*
 	/// \todo REMOVE ME. A test: map 0x1ff000 to 0xb8000
 	kmap(kpde, (char*)0xb8000, (char*)0x1ff000);
 
@@ -56,6 +57,7 @@ void mm_init()
 	size_t i;
 	for(i = 0; i < sizeof(text_to_show); i++, text += 2)
 		*text = text_to_show[i];
+	*/
 }
 
 void *kmalloc(size_t sz)
@@ -71,7 +73,6 @@ void *kmalloc(size_t sz)
 	void *addr = free;
 	free += sz;
 
-	log_printf("debug: kmalloc(sz=%d) = 0x%x\n", sz, (uint32_t)addr);
 	return addr;
 }
 
@@ -87,9 +88,6 @@ void *kpagealloc(size_t pages)
 	}
 
 	free = new_free + (pages * PAGE_SZ);
-
-	log_printf("debug: kpagealloc(pages = %d) = 0x%x\n", pages, 
-			(uint32_t)new_free);
 	return new_free;
 }
 

@@ -35,6 +35,7 @@ void kmain(long magic, void *mbi)
 	idt_init();
 
 	userinit();
+	pic_enable(IRQ_TIMER);
 	sched();
 
 	for(;;);

@@ -18,6 +18,8 @@ void idt_init()
 	for (i = 0; i < 256; i++)
 		SETGATE(idt[i], 0, SEG_KCODE << 3, vectors[i], DPL_SYS);
 	SETGATE(idt[T_SYSCALL], 1, SEG_KCODE << 3, vectors[T_SYSCALL], DPL_USR);
+	/// \todo remove me
+	SETGATE(idt[T_SYSCALL + 1], 1, SEG_KCODE << 3, vectors[T_SYSCALL + 1], DPL_USR);
 
 	lidt(idt, sizeof(idt));
 }
@@ -80,9 +82,17 @@ void trap(struct trapframe_t* tf)
 	case T_SIMDERR:
 		log_printf("SIMD floating point\n");
 		break;
+	case T_IRQ0 + IRQ_TIMER:
+		log_printf("debug: irq0\n");
+		sched();
+		break;
 	case T_SYSCALL:
 		log_printf("syscall\n");
 		break;
+	case T_SYSCALL + 1:	/// \todo remove me
+		log_printf("syscall2\n");
+		break;
+	/// \todo REMOVE ME. A test: map 0x1ff000 to 0xb8000
 	default:
 		log_printf("unhandled trap 0x%x\n", tf->trapno);
 	}
