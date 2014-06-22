@@ -83,16 +83,14 @@ void trap(struct trapframe_t* tf)
 		log_printf("SIMD floating point\n");
 		break;
 	case T_IRQ0 + IRQ_TIMER:
-		log_printf("debug: irq0\n");
-		sched();
+		yield();
 		break;
 	case T_SYSCALL:
-		log_printf("syscall\n");
+		outb(0xe9, 'A');
 		break;
 	case T_SYSCALL + 1:	/// \todo remove me
-		log_printf("syscall2\n");
+		outb(0xe9, 'B');
 		break;
-	/// \todo REMOVE ME. A test: map 0x1ff000 to 0xb8000
 	default:
 		log_printf("unhandled trap 0x%x\n", tf->trapno);
 	}

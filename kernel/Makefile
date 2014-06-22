@@ -12,7 +12,8 @@ OBJS=\
 	trapasm.o \
 	string.o \
 	proc.o \
-	swtch.o
+	swtch.o \
+	x86.o
 
 OUT=../disk/boot/kernel
 

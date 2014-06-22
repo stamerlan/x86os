@@ -118,6 +118,7 @@ void *kmalloc(size_t sz);
 void *kpagealloc(size_t pages);
 struct pde_t *setupvm();
 void kmap(struct pde_t *pde, char *phys, char *virt);
+void yield();
 void sched();
 
 #endif /* MM_H */

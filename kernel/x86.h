@@ -42,4 +42,7 @@
 #define CR0_CD		0x40000000	// Cache Disable
 #define CR0_PG		0x80000000	// Paging
 
+void pushcli();
+void popcli();
+
 #endif /* X86_H */

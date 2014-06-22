@@ -81,13 +81,15 @@ static inline void lidt(struct gatedesc_t* d, size_t sz)
 }
 
 /// \todo add description
+/// \note shouldn't be used directly. Use pushcli() instead
 static void cli() __attribute__((always_inline));
 static inline void cli()
 {
 	asm volatile("cli");
 }
 
-/// \todo add description
+/// \todo add descriptio
+/// \note shouldn't be used directly. Use popcli() instead
 static void sti() __attribute__((always_inline));
 static inline void sti()
 {

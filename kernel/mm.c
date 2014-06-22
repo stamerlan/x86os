@@ -23,6 +23,7 @@ static char *free = (char*)0x200000;
 const char *max_mem = (char*)0x2000000;	// 32 MB
 
 extern struct proc_t *proc_list;
+struct proc_t *current = NULL;
 
 void mm_init()
 {
@@ -123,7 +124,7 @@ void kmap(struct pde_t *pde, char *phys, char *virt)
 
 static void switchvm(struct proc_t *p)
 {
-	cli();
+	pushcli();
 	gdt[SEG_TSS] = SEG16(STS_T32A, &ts,
 			sizeof(struct taskstate_t), DPL_SYS);
 	gdt[SEG_TSS].s = 0;
@@ -131,27 +132,30 @@ static void switchvm(struct proc_t *p)
 	ts.esp0 = (uint32_t)p->kstack + KSTACK_SZ;
 	ltr(SEG_TSS << 3);
 	wcr3((uint32_t)p->pgdir);
-	sti();
+	popcli();
 }
 
+void yield()
+{
+	swtch(&current->context, kcontext);
+}
+
+// only kernel context
 void sched()
 {
 	for(;;)
 	{
-		sti();
-
 		struct proc_t *p;
 		for(p = proc_list; p != NULL; p = p->next)
 		{
 			if (p->state != RUNNABLE)
 				continue;
 
+			current = p;
 			switchvm(p);
 			p->state = RUNNING;
 			swtch(&kcontext, p->context);
-
-			// return to kernel?
-			asm volatile("int $3");
+			p->state = RUNNABLE;
 		}
 	}
 }

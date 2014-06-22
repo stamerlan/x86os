@@ -10,6 +10,7 @@
 #include "trap.h"
 #include "asm.h"
 #include "proc.h"
+#include "x86.h"
 
 extern struct pde_t *kpde;
 /*!
@@ -35,6 +36,7 @@ void kmain(long magic, void *mbi)
 	idt_init();
 
 	userinit();
+	pushcli();
 	pic_enable(IRQ_TIMER);
 	sched();
 

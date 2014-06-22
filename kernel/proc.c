@@ -18,11 +18,11 @@ struct proc_t *proc_list = NULL;
 extern void trapret();
 
 /* simple program to run in user mode:
- * 		int	64
- *.loop:	jmp	.loop
+ *.loop:	int	64	; prog2: int 65
+ *		jmp	.loop
  */
-static char prog[] = {0xcd, 0x40, 0xeb, 0xfe};
-static char prog2[] = {0xcd, 0x41, 0xeb, 0xfe};
+static char prog[] = {0xcd, 0x40, 0xeb, 0xfc};
+static char prog2[] = {0xcd, 0x41, 0xeb, 0xfc};
 
 // creates proc in ptable and returns its pointer
 // setups kstack, pid, context
