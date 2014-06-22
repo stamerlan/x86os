@@ -1,7 +1,5 @@
-/*!
- * \file mm.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \details memory manager. Creates GDT and PDE,setups pagging
+/* File: mm.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #include "mm.h"
@@ -14,7 +12,7 @@
 static struct segdesc_t gdt[NR_SEGS];
 static struct taskstate_t ts;
 static struct context_t *kcontext;
-/// \todo make static
+// TODO: make static
 struct pde_t *kpde; 
 
 void swtch(struct context_t **old, struct context_t *new);
@@ -50,7 +48,7 @@ void mm_init()
 	wcr0(cr0);
 
 	/*
-	/// \todo REMOVE ME. A test: map 0x1ff000 to 0xb8000
+	// TODO: REMOVE ME. A test: map 0x1ff000 to 0xb8000
 	kmap(kpde, (char*)0xb8000, (char*)0x1ff000);
 
 	char* text = (char*)(0x1ff000 + 80 * 2 * 1);
@@ -114,8 +112,8 @@ struct pde_t *setupvm()
 	return pde;
 }
 
-/// \note: addr should be 4KB-aligned
-/// \todo: assumed pte placed one after the other 
+// NOTO: addr should be 4KB-aligned
+// TODO: assumed pte placed one after the other 
 void kmap(struct pde_t *pde, char *phys, char *virt)
 {
 	struct pte_t *pte = (struct pte_t*)(pde->pte << 12);

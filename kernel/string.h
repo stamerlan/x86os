@@ -1,6 +1,5 @@
-/*!
- * \file string.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: string.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef STRING_H

@@ -1,6 +1,5 @@
-/*!
- * \file trap.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: trap.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #include "types.h"
@@ -18,8 +17,9 @@ void idt_init()
 	for (i = 0; i < 256; i++)
 		SETGATE(idt[i], 0, SEG_KCODE << 3, vectors[i], DPL_SYS);
 	SETGATE(idt[T_SYSCALL], 1, SEG_KCODE << 3, vectors[T_SYSCALL], DPL_USR);
-	/// \todo remove me
-	SETGATE(idt[T_SYSCALL + 1], 1, SEG_KCODE << 3, vectors[T_SYSCALL + 1], DPL_USR);
+	// TODO: remove me
+	SETGATE(idt[T_SYSCALL + 1], 1, SEG_KCODE << 3, vectors[T_SYSCALL + 1], 
+			DPL_USR);
 
 	lidt(idt, sizeof(idt));
 }
@@ -88,7 +88,7 @@ void trap(struct trapframe_t* tf)
 	case T_SYSCALL:
 		outb(0xe9, 'A');
 		break;
-	case T_SYSCALL + 1:	/// \todo remove me
+	case T_SYSCALL + 1:	// TODO: remove me
 		outb(0xe9, 'B');
 		break;
 	default:

@@ -1,17 +1,15 @@
-/*!
- * \file string.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: string.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #include "types.h"
 #include "string.h"
 
-/*!
- * \breif fill memory with a constant byte
- * \details fills the first \a n bytes of memory area pointed to by \a s with
- * the constant byte \a c
- * \return returns a pointer to the memory area \a s
- * \todo use asm stosb and stosl
+/* Fill memory with a constant byte
+ * Detailed: Fills the first n bytes of memory area pointed to by s with
+ * the constant byte c
+ * Return: A pointer to the memory area s
+ * TODO: use asm stosb and stosl
  */
 void *memset(void *s, int c, size_t n)
 {
@@ -22,13 +20,12 @@ void *memset(void *s, int c, size_t n)
 	return s;
 }
 
-/*!
- * \breif copy memory area
- * \details copies \a n bytes from memory area \a src to memory area \a dest.
+/* Copy memory area
+ * Detailed: Copies n bytes from memory area src to memory area dest.
  * The memory areas may overlap: copying takes place as though the bytes in
- * \a src are first copied into a temporary array that does not overlap \a src
- * or \a dest, and the bytes are then copied from the temporary array to \a dest
- * \return a pointer to \a dest
+ * src are first copied into a temporary array that does not overlap src
+ * or dest, and the bytes are then copied from the temporary array to dest
+ * Return: A pointer to dest
  */
 void *memmove(void *dest, const void *src, size_t n)
 {

@@ -1,6 +1,5 @@
-/*!
- * \file proc.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: proc.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef PROC_H

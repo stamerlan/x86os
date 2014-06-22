@@ -1,6 +1,5 @@
-/*!
- * \file proc.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: proc.c
+ * Author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #include "proc.h"
@@ -12,7 +11,7 @@
 #include "x86.h"
 #include "log.h"
 
-/// process list
+// Process list
 struct proc_t *proc_list = NULL;
 
 extern void trapret();
@@ -24,8 +23,9 @@ extern void trapret();
 static char prog[] = {0xcd, 0x40, 0xeb, 0xfc};
 static char prog2[] = {0xcd, 0x41, 0xeb, 0xfc};
 
-// creates proc in ptable and returns its pointer
-// setups kstack, pid, context
+/* creates proc in ptable and returns its pointer
+ * setups kstack, pid, context
+ */
 static void *allocproc()
 {
 	static int nextpid = 1;
@@ -59,6 +59,7 @@ static void *allocproc()
 
 	return p;
 }
+
 // create 1st usr proc
 void userinit()
 {
@@ -76,7 +77,7 @@ void userinit()
 	p->tf->eflags = FL_IF;
 	p->tf->esp = PAGE_SZ;
 	p->tf->eip = 0;
-	/// \todo Remove this part
+	// TODO: Remove this part
 	p->tf->eax = 0xAAAAAAAA;
 	p->tf->ebx = 0xBBBBBBBB;
 	p->tf->ecx = 0xCCCCCCCC;
@@ -92,7 +93,7 @@ void userinit()
 
 	p->state = RUNNABLE;
 
-	/// create 2nd usr proc
+	// Create 2nd usr proc
 	p = allocproc();
 	p->pgdir = setupvm();
 	log_printf("debug: userinit(): process2 pde = 0x%x\n", p->pgdir);
@@ -107,7 +108,7 @@ void userinit()
 	p->tf->eflags = FL_IF;
 	p->tf->esp = PAGE_SZ;
 	p->tf->eip = 0;
-	/// \todo Remove this part
+	// TODO: Remove this part
 	p->tf->eax = 0xAAAAAAAA;
 	p->tf->ebx = 0xBBBBBBBB;
 	p->tf->ecx = 0xCCCCCCCC;

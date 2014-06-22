@@ -1,11 +1,10 @@
-/*!
- * \file log.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \details logging module
- * \todo use bochs 0xE9 port for output
- * \todo use ring buffer for messages
- * \todo remove any console output
- * \todo looks like smth with console scrolling
+/* File: log.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+ *
+ * TODO: use bochs 0xE9 port for output
+ * TODO: use ring buffer for messages
+ * TODO: remove any console output
+ * TODO: looks like smth with console scrolling
  */
 
 #define LOG_WIDTH	80
@@ -18,14 +17,11 @@
 
 static unsigned char xpos = 0;
 static unsigned char ypos = 0;
-/// \todo use define instead
+// TODO: use define instead
 static char *video = (char *)0xb8000;
 
-/*!
- * \breif log init
- * \details reads cursor pos from bios mem
- *
- * \note Should be called before any log operations
+/* Reads cursor pos from bios mem
+ * NOTE: Should be called before any log operations
  */
 void log_init()
 {
@@ -33,12 +29,7 @@ void log_init()
 	ypos = *((unsigned char *) 0x451);
 }
 
-/*!
- * \breif clear log
- * \details fills all video memory with '\0'
- * \note log should be init
- * \see log_init()
- */
+// Fills all video memory with '\0'
 void log_clear()
 {
 	unsigned int i;
@@ -46,11 +37,7 @@ void log_clear()
 		video[i * 2] = '\0';
 }
 
-/*!
- * \brief inserts new line to log
- * \details setups xpos, ypos, scrolles screen if necessary, sets cursor pos
- * \note log should be init
- */
+// Setups xpos, ypos, scrolles screen if necessary, sets cursor pos
 static void log_newline()
 {
 	xpos = 0;
@@ -69,10 +56,7 @@ static void log_newline()
 	}
 }
 
-/*!
- * \brief moves cursor to pos xpos, ypos
- * \note xpos and ypos should be set
- */
+// Moves cursor to positon (xpos, ypos)
 static void log_move_cursor()
 {
 	uint16_t pos = ypos * LOG_WIDTH + xpos;
@@ -82,13 +66,7 @@ static void log_move_cursor()
 	outb(0x3d5, pos);
 }
 
-/*!
- * \brief put char
- * \details copy char to video ram, text attribute = 7, moves cursor
- * \param c - char to print (recognized special chars: \n, \t)
- * \note log should be init
- * \see log_init
- */
+// Copy char to video ram, text attribute = 7, moves cursor
 void log_putc(char c)
 {
 	switch (c) {
@@ -113,13 +91,7 @@ void log_putc(char c)
 	log_move_cursor();
 }
 
-/*!
- * \brief print string to log
- * \details uses log_putc() in loop
- * \param s - pointer to ASCIIZ string
- * \note log should be init
- * \see log_init
- */
+// Print string to log
 void log_puts(char *s)
 {
 	char *p = s;
@@ -129,12 +101,8 @@ void log_puts(char *s)
 	}
 }
 
-/*!
- * \brief format and print string to log
- * \details supported formats: %d, %u, %x, %s, %c
- * \param fmt - format string
- * \note log should be init
- * \see log_init
+/* Format and print string to log
+ * NOTE: supported formats: %d, %u, %x, %s, %c
  */
 void log_printf(char *fmt, ...)
 {

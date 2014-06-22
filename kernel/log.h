@@ -1,13 +1,10 @@
-/*!
- * \file log.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \todo add function description
+/* File: log.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef LOG_H
 #define LOG_H
 
-/// \see log.c:log_init()
 void log_init();
 void log_clear();
 void log_putc(char c);

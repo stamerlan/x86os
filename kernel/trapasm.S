@@ -1,4 +1,4 @@
-  # vectors.S sends all traps here.
+# vectors.S sends all traps here.
 .globl alltraps
 alltraps:
 	# Build trap frame

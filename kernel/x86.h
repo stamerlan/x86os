@@ -1,6 +1,5 @@
-/*!
- * \file x86.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: x86.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef X86_H

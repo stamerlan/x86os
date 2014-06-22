@@ -1,6 +1,5 @@
-/*!
- * \file trap.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: trap.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef TRAP_H
@@ -8,35 +7,30 @@
 
 #include "types.h"
 
-/*!
- * \struct gatedesc_t
- * \breif gate descriptors for interrupts and traps
- */
+// Gate descriptors for interrupts and traps
 struct gatedesc_t
 {
-	uint32_t ofs_15_0 : 16;		///< low 16 bits of offset in segment
-	uint32_t cs : 16;		///< code segment selector
-	uint32_t args : 5;		///< # args, 0 for int/trap gates
-	uint32_t rsv : 3;		///< reserved
-	//uint32_t type : 4;
-	/*!
-	 * \enum gate_type
-	 * sysyem segment type bits
+	uint32_t ofs_15_0 : 16;		// low 16 bits of offset in segment
+	uint32_t cs : 16;		// code segment selector
+	uint32_t args : 5;		// # args, 0 for int/trap gates
+	uint32_t rsv : 3;		// reserved
+	/* Sysyem segment type bits
+	 * TODO: Use define instead
 	 */
 	enum gate_type
 	{
-		STS_IG32 = 0xE,		///< 32-bit int gate
-		STS_TG32 = 0xF,		///< 32-bit trap gate
+		STS_IG32 = 0xE,		// 32-bit int gate
+		STS_TG32 = 0xF,		// 32-bit trap gate
 	} type : 4;
-	uint32_t s : 1;			///< must be 0 (system)
-	enum dpl_t dpl : 2;		///< descr (meaning new) privilege lvl
-	uint32_t p : 1;			///< present
-	uint32_t ofs_31_16 : 16;	///< high bits of offset in segment
+	uint32_t s : 1;			// must be 0 (system)
+	enum dpl_t dpl : 2;		// descr (meaning new) privilege lvl
+	uint32_t p : 1;			// present
+	uint32_t ofs_31_16 : 16;	// high bits of offset in segment
 };
 
-/// \todo add documentation
-// Layout of the trap frame built on the stack by the
-// hardware and by trapasm.S, and passed to trap().
+/* Layout of the trap frame built on the stack by the hardware and by 
+ * trapasm.S, and passed to trap().
+ */
 struct trapframe_t
 {
 	// pusha
@@ -73,16 +67,14 @@ struct trapframe_t
 	uint16_t pad6;
 };
 
-/*!
- * \def SETGATE
- * \details Set up a normal interrupt/trap gate descriptor.
- * - \a istrap: 1 for a trap (= exception) gate, 0 for an interrupt gate.
- *   interrupt gate clears FL_IF, trap gate leaves FL_IF alone
- * - \a sel: Code segment selector for interrupt/trap handler
- * - \a ofs: Offset in code segment for interrupt/trap handler
- * - \a d: Descriptor Privilege Level -
- *        the privilege level required for software to invoke
- *        this interrupt/trap gate explicitly using an int instruction.
+/* Set up a normal interrupt/trap gate descriptor.
+ *  - istrap: 1 for a trap (= exception) gate, 0 for an interrupt gate.
+ *            interrupt gate clears FL_IF, trap gate leaves FL_IF alone
+ *  - sel:    Code segment selector for interrupt/trap handler
+ *  - ofs:    Offset in code segment for interrupt/trap handler
+ *  -  d:     Descriptor Privilege Level -
+ *            the privilege level required for software to invoke
+ *            this interrupt/trap gate explicitly using an int instruction.
  */
 #define SETGATE(gate, istrap, sel, ofs, d)		\
 {							\
@@ -97,7 +89,6 @@ struct trapframe_t
 	  (gate).ofs_31_16 = (uint32_t)(ofs) >> 16;	\
 }
 
-/// \todo add description
 void idt_init();
 
 #endif /* TRAP_H */

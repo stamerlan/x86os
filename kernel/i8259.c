@@ -1,16 +1,15 @@
-/*!
- * \file i8259.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \details Intel 8259A programmable inerrupt controller
+/* File: i8259.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+ *
+ * Intel 8259A programmable inerrupt controller
  */
 
 #include "asm.h"
 #include "i8259.h"
 #include "types.h"
 
-/*!
- * Current IRQ mask/
- * \note Initial IRQ mask has int 2 enabled (for slave 8259A)
+/* Current IRQ mask
+ * NOTE: Initial IRQ mask has int 2 enabled (for slave 8259A)
  */
 static uint16_t irqmask = 0xFFFF & ~(1 << IRQ_SLAVE);
 

@@ -34,3 +34,4 @@ vectors.S:	vectors.pl
 
 clean:
 	rm -f $(OBJS) $(OUT)
+	rm -f vectors.S

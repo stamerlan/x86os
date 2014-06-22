@@ -31,9 +31,6 @@ symb:	all
 bochs:	all img symb
 	$(BOCHS) -f $(BOCHSCONF) -q
 
-docs:	doxyfile
-	doxygen doxyfile
-
 backup:	clean
 	cd .. && tar -cvzf x86os-backup.tar.gz x86os
 

@@ -1,7 +1,5 @@
-/*!
- * \file types.h
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * \details Some types
+/* File: types.h
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #ifndef TYPES_H
@@ -13,17 +11,16 @@ typedef unsigned int	uint32_t;
 typedef unsigned short	uint16_t;
 typedef unsigned char	uint8_t;
 
-typedef uint32_t	size_t;		/// type contains size in bytes of smth
+typedef uint32_t	size_t;		// size in bytes of smth
 
 
-/*!
- * \enum dpl_t
- * Descriptor Privilege Level
+/* Descriptor Privilege Level
+ * TODO: Use define instead
  */
 enum dpl_t
 {
-	DPL_SYS	= 0,		///< System segment
-	DPL_USR = 3,		///< User segment
+	DPL_SYS	= 0,		// System segment
+	DPL_USR = 3,		// User segment
 };
 
 #endif /* TYPES_H */

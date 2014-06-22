@@ -1,6 +1,5 @@
-/*!
- * \file x86.c
- * \author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+/* File: x86.c
+ * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
 #include "x86.h"
