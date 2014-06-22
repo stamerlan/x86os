@@ -26,9 +26,8 @@ export INCDIR = $(PWD)/include/
 export LIBS
 
 all:
-	mkdir $(LIBDIR)
+	mkdir -p $(LIBDIR)
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
-	rm -fr $(LIBDIR)
 
 img:	all
 	sudo ./mkdisk.sh $(IMG)
@@ -48,5 +47,5 @@ backup:	clean
 
 clean:
 	rm -f $(IMG) System.map
-	rm -rf docs/
+	rm -fr $(LIBDIR)
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
