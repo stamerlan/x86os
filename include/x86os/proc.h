@@ -5,11 +5,11 @@
 #ifndef PROC_H
 #define PROC_H
 
-#include "types.h"
-#include "mm.h"
-#include "trap.h"
+#include <x86os/types.h>
+#include <x86os/mm/page.h>
+#include <x86os/trap.h>
 
-struct context_t
+struct context
 {
 	uint32_t edi;
 	uint32_t esi;
@@ -18,24 +18,25 @@ struct context_t
 	uint32_t eip;
 };
 
-enum procstate_t { EMBRYO, RUNNABLE, RUNNING };
+// TODO: Use define insted
+enum procstate { EMBRYO, RUNNABLE, RUNNING };
 
 // Per-process state
-struct proc_t
+struct proc
 {
 	uint32_t sz;			// size of process memory (bytes)
-	struct pde_t* pgdir;		// page table
+	struct pde* pgdir;		// page table
 	char *kstack;			// bottom of kstack for this proc
-	enum procstate_t state;		// process state
+	enum procstate state;		// process state
 	int pid;			// process ID
-	struct proc_t *parent;		// parent process
-	struct proc_t *next;		// next proc in ptable
-	struct trapframe_t *tf;		// trap frame for current syscall
-	struct context_t *context;	// swtch() here to run process
+	struct proc *parent;		// parent process
+	struct proc *next;		// next proc in ptable
+	struct trapframe *tf;		// trap frame for current syscall
+	struct context *context;	// swtch() here to run process
 };
 
-/// TSS format
-struct taskstate_t
+// TSS format
+struct taskstate
 {
 	uint32_t link;		// old ts selector
 	uint32_t esp0;		// kstack ptr and selector

@@ -16,6 +16,7 @@ typedef uint32_t	size_t;		// size in bytes of smth
 
 /* Descriptor Privilege Level
  * TODO: Use define instead
+ * TODO: Move it to somewhere else
  */
 enum dpl_t
 {

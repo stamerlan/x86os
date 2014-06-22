@@ -11,9 +11,9 @@
 #define LOG_HEIGHT	25
 
 #include <stdarg.h>
-#include "types.h"
-#include "log.h"
-#include "asm.h"
+#include <x86os/types.h>
+#include <x86os/log.h>
+#include <x86os/asm.h>
 
 static unsigned char xpos = 0;
 static unsigned char ypos = 0;

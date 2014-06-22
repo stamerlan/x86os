@@ -2,17 +2,18 @@
  * Author Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include "proc.h"
-#include "types.h"
-#include "mm.h"
-#include "trap.h"
-#include "config.h"
-#include "string.h"
-#include "x86.h"
-#include "log.h"
+#include <x86os/proc.h>
+#include <x86os/types.h>
+#include <x86os/mm/mm.h>
+#include <x86os/mm/seg.h>
+#include <x86os/trap.h>
+#include <x86os/config.h>
+#include <x86os/string.h>
+#include <x86os/x86.h>
+#include <x86os/log.h>
 
 // Process list
-struct proc_t *proc_list = NULL;
+struct proc *proc_list = NULL;
 
 extern void trapret();
 
@@ -30,7 +31,7 @@ static void *allocproc()
 {
 	static int nextpid = 1;
 
-	struct proc_t *p = kmalloc(sizeof(struct proc_t));
+	struct proc *p = kmalloc(sizeof(struct proc));
 	p->state = EMBRYO;
 	p->pid = nextpid++;
 	p->kstack = kpagealloc(KSTACK_SZ / PAGE_SZ);
@@ -38,8 +39,8 @@ static void *allocproc()
 
 	char *sp = p->kstack + KSTACK_SZ;
 	// Leave place for trap frame
-	sp -= sizeof(struct trapframe_t);
-	p->tf = (struct trapframe_t*)sp;
+	sp -= sizeof(struct trapframe);
+	p->tf = (struct trapframe*)sp;
 	log_printf("debug: allocproc(): tf = 0x%x\n", (uint32_t)p->tf);
 
 	/*
@@ -49,8 +50,8 @@ static void *allocproc()
 			sp, *(uint32_t*)sp);
 	*/
 
-	sp -= sizeof(struct context_t);
-	p->context = (struct context_t*)sp;
+	sp -= sizeof(struct context);
+	p->context = (struct context*)sp;
 	log_printf("debug: allocproc(): context = 0x%x\n", p->context);
 	p->context->eip = (uint32_t)trapret;
 
@@ -63,13 +64,13 @@ static void *allocproc()
 // create 1st usr proc
 void userinit()
 {
-	struct proc_t *p = allocproc();
+	struct proc *p = allocproc();
 	p->pgdir = setupvm();
 	log_printf("debug: userinit(): process pde = 0x%x\n", p->pgdir);
 	char *mem = kpagealloc(1);
-	kmap(p->pgdir, mem, (char*)0x0);
+	kmap(p->pgdir, mem, (void*)0x0);
 	p->sz = PAGE_SZ;
-	memset(p->tf, 0, sizeof(struct trapframe_t));
+	memset(p->tf, 0, sizeof(struct trapframe));
 	p->tf->cs = (SEG_UCODE << 3) | DPL_USR;
 	p->tf->ds = (SEG_UDATA << 3) | DPL_USR;
 	p->tf->es = p->tf->ds;
@@ -98,9 +99,9 @@ void userinit()
 	p->pgdir = setupvm();
 	log_printf("debug: userinit(): process2 pde = 0x%x\n", p->pgdir);
 	mem = kpagealloc(1);
-	kmap(p->pgdir, mem, (char*)0x00);
+	kmap(p->pgdir, mem, (void*)0x00);
 	p->sz = PAGE_SZ;
-	memset(p->tf, 0, sizeof(struct trapframe_t));
+	memset(p->tf, 0, sizeof(struct trapframe));
 	p->tf->cs = (SEG_UCODE << 3) | DPL_USR;
 	p->tf->ds = (SEG_UDATA << 3) | DPL_USR;
 	p->tf->es = p->tf->ds;

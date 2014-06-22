@@ -2,8 +2,7 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include "types.h"
-#include "string.h"
+#include <x86os/types.h>
 
 /* Fill memory with a constant byte
  * Detailed: Fills the first n bytes of memory area pointed to by s with

@@ -3,7 +3,7 @@
 # Contains multiboot header, here bootloader pass controll.
 # TODO: kmain should never return replace call with loop and remove halt loop
 
-#include "config.h"
+#include <x86os/config.h>
 
 # TODO: maybe use multiboot.h?
 #define MB_HEADER_MAGIC 0x1BADB002

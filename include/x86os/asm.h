@@ -7,9 +7,9 @@
 #ifndef ASM_H
 #define ASM_H
 
-#include "types.h"
-#include "mm.h"
-#include "trap.h"
+#include <x86os/types.h>
+#include <x86os/mm/seg.h>
+#include <x86os/trap.h>
 
 static uint8_t inb(uint16_t port) __attribute__((always_inline)); 
 static inline uint8_t inb(uint16_t port)
@@ -26,8 +26,8 @@ static inline void outb(uint16_t port, uint8_t data)
 	asm volatile("out %0, %1" : : "a"(data), "d"(port));
 }
 
-static void lgdt(struct segdesc_t* d, size_t sz) __attribute__((always_inline));
-static inline void lgdt(struct segdesc_t* d, size_t sz)
+static void lgdt(struct segdesc *d, size_t sz) __attribute__((always_inline));
+static inline void lgdt(struct segdesc* d, size_t sz)
 {
 	struct 
 	{
@@ -41,9 +41,8 @@ static inline void lgdt(struct segdesc_t* d, size_t sz)
 	asm volatile("lgdt (%0)" : : "r"(&gdtr));
 }
 
-static void lidt(struct gatedesc_t* d, size_t sz) 
-	__attribute__((always_inline));
-static inline void lidt(struct gatedesc_t* d, size_t sz)
+static void lidt(struct gatedesc *d, size_t sz) __attribute__((always_inline));
+static inline void lidt(struct gatedesc *d, size_t sz)
 {
 	struct
 	{

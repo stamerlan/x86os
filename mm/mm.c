@@ -2,26 +2,22 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include "mm.h"
-#include "asm.h"
-#include "log.h"
-#include "x86.h"
-#include "proc.h"
-#include "config.h"
+#include <x86os/asm.h>
+#include <x86os/log.h>
+#include <x86os/config.h>
+#include <x86os/proc.h>
+#include <x86os/x86.h>
+#include <x86os/mm/seg.h>
+#include <x86os/mm/page.h>
 
-static struct segdesc_t gdt[NR_SEGS];
-static struct taskstate_t ts;
-static struct context_t *kcontext;
-// TODO: make static
-struct pde_t *kpde; 
+#include <x86os/mm/mm.h>
 
-void swtch(struct context_t **old, struct context_t *new);
+static struct segdesc gdt[NR_SEGS];
+static struct taskstate ts;
 
+static struct pde *kpde; 
 static char *free = (char*)0x200000;
 const char *max_mem = (char*)0x2000000;	// 32 MB
-
-extern struct proc_t *proc_list;
-struct proc_t *current = NULL;
 
 void mm_init()
 {
@@ -49,7 +45,7 @@ void mm_init()
 
 	/*
 	// TODO: REMOVE ME. A test: map 0x1ff000 to 0xb8000
-	kmap(kpde, (char*)0xb8000, (char*)0x1ff000);
+	kmap(kpde, (void*)0xb8000, (void*)0x1ff000);
 
 	char* text = (char*)(0x1ff000 + 80 * 2 * 1);
 	static char text_to_show[] = "kmap() works fine!";
@@ -91,13 +87,13 @@ void *kpagealloc(size_t pages)
 }
 
 // setups VM
-struct pde_t *setupvm()
+struct pde *setupvm()
 {
 	size_t i;
-	char *phys = 0;
+	void *phys = 0;
 
-	struct pde_t *pde = kpagealloc(1);
-	struct pte_t *pte = kpagealloc(1024);
+	struct pde *pde = kpagealloc(1);
+	struct pte *pte = kpagealloc(1024);
 
 	log_printf("debug: setupvm(): pde = 0x%x, pte = 0x%x\n",
 			(uint32_t)pde, (uint32_t)pte);
@@ -114,17 +110,17 @@ struct pde_t *setupvm()
 
 // NOTO: addr should be 4KB-aligned
 // TODO: assumed pte placed one after the other 
-void kmap(struct pde_t *pde, char *phys, char *virt)
+void kmap(struct pde *pde, void *phys, void *virt)
 {
-	struct pte_t *pte = (struct pte_t*)(pde->pte << 12);
+	struct pte *pte = (struct pte*)(pde->pte << 12);
 	pte[(uint32_t)virt >> 12] = PTE(phys);
 }
 
-static void switchvm(struct proc_t *p)
+void switchvm(struct proc *p)
 {
 	pushcli();
 	gdt[SEG_TSS] = SEG16(STS_T32A, &ts,
-			sizeof(struct taskstate_t), DPL_SYS);
+			sizeof(struct taskstate), DPL_SYS);
 	gdt[SEG_TSS].s = 0;
 	ts.ss0 = SEG_KDATA << 3;
 	ts.esp0 = (uint32_t)p->kstack + KSTACK_SZ;
@@ -133,27 +129,3 @@ static void switchvm(struct proc_t *p)
 	popcli();
 }
 
-void yield()
-{
-	swtch(&current->context, kcontext);
-}
-
-// only kernel context
-void sched()
-{
-	for(;;)
-	{
-		struct proc_t *p;
-		for(p = proc_list; p != NULL; p = p->next)
-		{
-			if (p->state != RUNNABLE)
-				continue;
-
-			current = p;
-			switchvm(p);
-			p->state = RUNNING;
-			swtch(&kcontext, p->context);
-			p->state = RUNNABLE;
-		}
-	}
-}

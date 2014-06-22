@@ -4,9 +4,13 @@
  * Intel 8259A programmable inerrupt controller
  */
 
-#include "asm.h"
-#include "i8259.h"
-#include "types.h"
+#include <x86os/asm.h>
+#include <x86os/i8259.h>
+#include <x86os/types.h>
+
+// I/O Addresses of the two PIC
+#define IO_PIC1		0x20	// Master PIC
+#define IO_PIC2		0xA0	// Slave PIC
 
 /* Current IRQ mask
  * NOTE: Initial IRQ mask has int 2 enabled (for slave 8259A)

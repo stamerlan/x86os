@@ -3,20 +3,32 @@
 # TODO: bochs on quit returns 1.
 # TODO: remove hardcoded kernel filename in symb
 
-SUBDIRS=\
+SUBDIRS = \
+	mm \
 	kernel
-IMG=disk.img
 
-MAKE=make
-QEMU=qemu-system-i386
+LIBS = \
+       mm
+
+IMG = disk.img
+
+MAKE = make
+QEMU = qemu-system-i386
+BOCHS=/opt/bochs/bin/bochs
+
 CPU_NR=1
 RAM_SZ=32
 QEMUOPTS=-smp $(CPU_NR) -m $(RAM_SZ)
-BOCHS=/opt/bochs/bin/bochs
 BOCHSCONF=bochs.conf
 
+export LIBDIR = $(PWD)/bin/
+export INCDIR = $(PWD)/include/
+export LIBS
+
 all:
+	mkdir $(LIBDIR)
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
+	rm -fr $(LIBDIR)
 
 img:	all
 	sudo ./mkdisk.sh $(IMG)

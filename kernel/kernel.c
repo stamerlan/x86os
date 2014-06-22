@@ -2,13 +2,12 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include "log.h"
-#include "mm.h"
-#include "i8259.h" 
-#include "trap.h"
-#include "asm.h"
-#include "proc.h"
-#include "x86.h"
+#include <x86os/log.h>
+#include <x86os/mm/mm.h>
+#include <x86os/i8259.h>
+#include <x86os/trap.h>
+#include <x86os/x86.h>
+#include <x86os/sched.h>
 
 void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)

@@ -2,9 +2,8 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include "x86.h"
-#include "asm.h"
-#include "log.h"
+#include <x86os/asm.h>
+#include <x86os/log.h>
 
 static int ncli = 0;
 
