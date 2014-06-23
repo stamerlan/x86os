@@ -38,3 +38,5 @@ vectors.S:	vectors.pl
 clean:
 	rm -f $(OBJS) $(OUT) vectors.S
 
+.PHONY:	clean
+

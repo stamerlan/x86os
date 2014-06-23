@@ -19,3 +19,6 @@ all:	$(OBJS)
 
 clean:
 	rm -f $(OBJS) $(OUT)
+
+.PHONY:	clean
+
