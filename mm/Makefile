@@ -1,25 +1,21 @@
 # x86os
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
 
-OBJS=\
-     mm.o
+OUT	= mm.o
 
-OUT=$(LIBDIR)libmm.a
+OBJS	= \
+	  memory.o
 
-CC=gcc
-AS=gas
-LD=ld
-AR=ar
-RANLIB=ranlib
+CC	= gcc
+AS	= gas
+LD	= ld
 
-CFLAGS=-fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -ggdb -m32 \
-       -Werror -fno-omit-frame-pointer -fno-stack-protector -I $(INCDIR)
-ASFLAGS=-m32 -gdwarf-2 -Wa,-divide
-LDFLAGS=-m elf_i386
+CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
+	  -fno-strict-aliasing -fno-omit-frame-pointer \
+	  -fno-stack-protector -finline-functions -I../include
 
 all:	$(OBJS)
-	$(AR) rc $(OUT) $(OBJS)
-	$(RANLIB) $(OUT)
+	$(LD) -r -o $(OUT) $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(OUT)

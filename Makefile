@@ -1,51 +1,43 @@
 # x86os
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
-# TODO: bochs on quit returns 1.
-# TODO: remove hardcoded kernel filename in symb
 
-SUBDIRS = \
-	mm \
-	kernel
+SUBDIRS		= kernel \
+		  mm
+# TODO: Try to use $SUBDIRS instead duplication
+ARCHIVES	= kernel/kernel.o \
+		  mm/mm.o
 
-LIBS = \
-       mm
+KERNELFILE	= tools/kernel
+IMG		= x86os.img
 
-IMG = disk.img
+LD		= ld
+QEMU		= qemu-system-i386
+BOCHS		= /opt/bochs/bin/bochs
 
-MAKE = make
-QEMU = qemu-system-i386
-BOCHS=/opt/bochs/bin/bochs
+QEMUOPTS	= -smp 1 -m 32
+BOCHSCONF	= bochs.conf
 
-CPU_NR=1
-RAM_SZ=32
-QEMUOPTS=-smp $(CPU_NR) -m $(RAM_SZ)
-BOCHSCONF=bochs.conf
-
-export LIBDIR = $(PWD)/bin/
-export INCDIR = $(PWD)/include/
-export LIBS
+# TODO: -s -x, What about ldscript?
+LDFLAGS		= -M -m elf_i386 -Ttext 0x100000
 
 all:
-	mkdir -p $(LIBDIR)
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
+	$(LD) $(LDFLAGS) $(ARCHIVES) -o $(KERNELFILE) > System.map
 
-img:	all
-	sudo ./mkdisk.sh $(IMG)
+tools/kernel:	all
+
+img:	tools/kernel
+	sudo tools/mkdisk.sh $(IMG) tools/kernel
 	sudo chown `id -u`:`id -g` $(IMG)
 
-qemu:	all img
+qemu:	img
 	$(QEMU) $(QEMUOPTS) -hda $(IMG)
 
-symb:	all
-	nm disk/boot/kernel | cut -f 1,3 -d ' ' > System.map
-
-bochs:	all img symb
+bochs:	img
 	$(BOCHS) -f $(BOCHSCONF) -q
 
-backup:	clean
-	cd .. && tar -cvzf x86os-backup.tar.gz x86os
-
 clean:
-	rm -f $(IMG) System.map
-	rm -fr $(LIBDIR)
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
+	rm -f $(IMG) System.map $(KERNELFILE)
+
+.PHONY:	clean qemu bochs img

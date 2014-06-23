@@ -1,4 +1,4 @@
-/* File: kernel.c
+/* File: main.c
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 

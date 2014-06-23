@@ -1,4 +1,4 @@
-/* File: mm.c
+/* File: memory.c
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 

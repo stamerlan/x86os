@@ -11,7 +11,6 @@
 #include <x86os/mm/seg.h>
 #include <x86os/trap.h>
 
-static uint8_t inb(uint16_t port) __attribute__((always_inline)); 
 static inline uint8_t inb(uint16_t port)
 {
 	uint8_t data;
@@ -20,16 +19,14 @@ static inline uint8_t inb(uint16_t port)
 	return data;
 }
 
-static void outb(uint16_t port, uint8_t data) __attribute__((always_inline));
 static inline void outb(uint16_t port, uint8_t data)
 {
 	asm volatile("out %0, %1" : : "a"(data), "d"(port));
 }
 
-static void lgdt(struct segdesc *d, size_t sz) __attribute__((always_inline));
 static inline void lgdt(struct segdesc* d, size_t sz)
 {
-	struct 
+	volatile struct 
 	{
 		uint16_t size;
 		uint32_t pgdt;
@@ -41,10 +38,9 @@ static inline void lgdt(struct segdesc* d, size_t sz)
 	asm volatile("lgdt (%0)" : : "r"(&gdtr));
 }
 
-static void lidt(struct gatedesc *d, size_t sz) __attribute__((always_inline));
 static inline void lidt(struct gatedesc *d, size_t sz)
 {
-	struct
+	volatile struct
 	{
 		uint16_t size;
 		uint32_t pidt;
@@ -56,14 +52,12 @@ static inline void lidt(struct gatedesc *d, size_t sz)
 }
 
 // NOTE: Shouldn't be used directly. Use pushcli() instead
-static void cli() __attribute__((always_inline));
 static inline void cli()
 {
 	asm volatile("cli");
 }
 
 // NOTE: Shouldn't be used directly. Use popcli() instead
-static void sti() __attribute__((always_inline));
 static inline void sti()
 {
 	asm volatile("sti");
@@ -83,7 +77,6 @@ static inline void sti()
 #define set_ss(selector) \
 	asm volatile("movw %w0, %%ss" : : "r"(selector))
 
-static uint32_t rcr0() __attribute__((always_inline));
 static inline uint32_t rcr0()
 {
 	uint32_t cr0;
@@ -91,19 +84,16 @@ static inline uint32_t rcr0()
 	return cr0;
 }
 
-static void wcr0(uint32_t cr0) __attribute__((always_inline));
 static inline void wcr0(uint32_t cr0)
 {
 	asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
-static void wcr3(uint32_t cr3) __attribute__((always_inline));
 static inline void wcr3(uint32_t cr3)
 {
 	asm volatile("mov %0, %%cr3" :: "r"(cr3));
 }
 
-static void ltr(uint16_t sel) __attribute__((always_inline));
 static inline void ltr(uint16_t sel)
 {
 	asm volatile("ltr %0" :: "r"(sel));

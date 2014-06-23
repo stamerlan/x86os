@@ -1,36 +1,40 @@
 # x86os
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+# TODO: What about make dep?
 
-OBJS=\
-	startup.o \
-	kernel.o \
-	log.o \
-	i8259.o \
-	vectors.o \
-	trap.o \
-	trapasm.o \
-	string.o \
-	proc.o \
-	swtch.o \
-	x86.o \
-	sched.o
+OUT	= kernel.o
 
-OUT=../disk/boot/kernel
+OBJS	= \
+	  startup.o \
+	  main.o \
+	  log.o \
+	  i8259.o \
+	  vectors.o \
+	  trap.o \
+	  trapasm.o \
+	  string.o \
+	  proc.o \
+	  swtch.o \
+	  x86.o \
+	  sched.o
 
-CC=gcc
-AS=gas
-LD=ld
+CC	= gcc
+AS	= gas
+LD	= ld
+PERL	= perl
 
-CFLAGS=-fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -ggdb -m32 \
-       -Werror -fno-omit-frame-pointer -fno-stack-protector -I $(INCDIR)
-ASFLAGS=-m32 -gdwarf-2 -Wa,-divide -I $(INCDIR)
-LDFLAGS=-m elf_i386 -L$(LIBDIR) -l$(LIBS)
+# TODO: What about -nostdinc
+CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
+	  -fno-strict-aliasing -fno-omit-frame-pointer \
+	  -fno-stack-protector -finline-functions -I../include
+ASFLAGS	= -Wa,-divide -I../include
 
 all:	$(OBJS)
-	$(LD) $(OBJS) $(LDFLAGS) -Ttext 0x100000 -o $(OUT) 
+	$(LD) -r -o $(OUT) $(OBJS)
+
 vectors.S:	vectors.pl
-	perl vectors.pl > vectors.S
+	$(PERL) vectors.pl > vectors.S
 
 clean:
-	rm -f $(OBJS) $(OUT)
-	rm -f vectors.S
+	rm -f $(OBJS) $(OUT) vectors.S
+
