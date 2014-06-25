@@ -2,10 +2,12 @@
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
 
 SUBDIRS		= kernel \
-		  mm
+		  mm \
+		  block
 # TODO: Try to use $SUBDIRS instead duplication
 ARCHIVES	= kernel/kernel.o \
-		  mm/mm.o
+		  mm/mm.o \
+		  block/block.o
 
 KERNELFILE	= tools/kernel
 IMG		= x86os.img

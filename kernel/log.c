@@ -5,6 +5,8 @@
  * TODO: use ring buffer for messages
  * TODO: remove any console output
  * TODO: looks like smth with console scrolling
+ * TODO: add print for 64-bit numbers
+ * TODO: create own stdarg.h (add blackjack and whores)
  */
 
 #define LOG_WIDTH	80
