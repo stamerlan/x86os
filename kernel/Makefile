@@ -15,11 +15,12 @@ PERL	= perl
 # TODO: What about -nostdinc
 CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
 	  -fno-strict-aliasing -fno-omit-frame-pointer \
-	  -fno-stack-protector -finline-functions -I../include
-ASFLAGS	= -Wa,-divide -I../include
+	  -fno-stack-protector -finline-functions -I../include -m32
+ASFLAGS	= -Wa,-divide -m32 -I../include
+LDFLAGS = -m elf_i386 -r
 
 all:	$(OBJS)
-	$(LD) -r -o $(OUT) $(OBJS)
+	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS)
 
 vectors.S:	vectors.pl
 	$(PERL) vectors.pl > vectors.S
