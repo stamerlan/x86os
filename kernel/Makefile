@@ -4,19 +4,8 @@
 
 OUT	= kernel.o
 
-OBJS	= \
-	  startup.o \
-	  main.o \
-	  log.o \
-	  i8259.o \
-	  vectors.o \
-	  trap.o \
-	  trapasm.o \
-	  string.o \
-	  proc.o \
-	  swtch.o \
-	  x86.o \
-	  sched.o
+OBJS	= startup.o main.o log.o i8259.o vectors.o trap.o trapasm.o string.o \
+	  proc.o swtch.o x86.o sched.o spinlock.o
 
 CC	= gcc
 AS	= gas

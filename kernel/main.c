@@ -20,10 +20,11 @@ void kmain(long magic, void *mbi)
 
 	pic_init();
 	idt_init();
-
 	userinit();
+
 	pushcli();
 	pic_enable(IRQ_TIMER);
+
 	sched();
 
 	for(;;);

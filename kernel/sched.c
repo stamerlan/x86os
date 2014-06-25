@@ -7,11 +7,10 @@
 #include <x86os/proc.h>
 #include <x86os/mm/mm.h>
 
-// Kernel context
-static struct context *kcontext;
-
 // Implemented in swtch.S
 void swtch(struct context **old, struct context *new);
+
+static struct context *kcontext;
 
 extern struct proc *proc_list;
 static struct proc *current;

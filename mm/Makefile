@@ -3,8 +3,7 @@
 
 OUT	= mm.o
 
-OBJS	= \
-	  memory.o
+OBJS	= memory.o
 
 CC	= gcc
 AS	= gas

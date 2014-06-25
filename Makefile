@@ -11,18 +11,22 @@ KERNELFILE	= tools/kernel
 IMG		= x86os.img
 
 LD		= ld
+NM		= nm
+STRIP		= strip
 QEMU		= qemu-system-i386
 BOCHS		= /opt/bochs/bin/bochs
 
 QEMUOPTS	= -smp 1 -m 32
 BOCHSCONF	= bochs.conf
 
-# TODO: -s -x, What about ldscript?
-LDFLAGS		= -M -m elf_i386 -Ttext 0x100000
+# TODO: What about ldscript?
+# TODO: $(STRIP) -s $(KERNELFILE)
+LDFLAGS		= -m elf_i386 -Ttext 0x100000
 
 all:
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
-	$(LD) $(LDFLAGS) $(ARCHIVES) -o $(KERNELFILE) > System.map
+	$(LD) $(LDFLAGS) $(ARCHIVES) -o $(KERNELFILE)
+	$(NM) $(KERNELFILE) | cut -f 1,3 -d ' ' > System.map
 
 tools/kernel:	all
 
