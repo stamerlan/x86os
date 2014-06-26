@@ -11,11 +11,19 @@
 #include <x86os/string.h>
 #include <x86os/x86.h>
 #include <x86os/log.h>
+#include <x86os/spinlock.h>
 
 // Process list
-struct proc *proc_list = NULL;
+struct 
+{
+	struct spinlock lock;
+	struct proc *proc;
+} ptable;
+static struct proc *current;
+static struct context *kcontext;
 
 extern void trapret();
+extern void swtch(struct context **old, struct context *new);
 
 /* simple program to run in user mode:
  *.loop:	int	64	; prog2: int 65
@@ -24,7 +32,15 @@ extern void trapret();
 static char prog[] = {0xcd, 0x40, 0xeb, 0xfc};
 static char prog2[] = {0xcd, 0x41, 0xeb, 0xfc};
 
-/* creates proc in ptable and returns its pointer
+// On first scheduling new process should release ptable.lock
+static void forkret()
+{
+	release(&ptable.lock);
+
+	// Return to trapret
+}
+
+/* Creates new process in ptable, returns its pointer
  * setups kstack, pid, context
  */
 static void *allocproc()
@@ -43,27 +59,72 @@ static void *allocproc()
 	p->tf = (struct trapframe*)sp;
 	log_printf("debug: allocproc(): tf = 0x%x\n", (uint32_t)p->tf);
 
-	/*
+	// Return from forkret to trapret
 	sp -= 4;
 	*(uint32_t*)sp = (uint32_t)trapret;
 	log_printf("debug: allocproc(): ret addr ptr = 0x%x, ret add = %x\n",
 			sp, *(uint32_t*)sp);
-	*/
 
 	sp -= sizeof(struct context);
 	p->context = (struct context*)sp;
 	log_printf("debug: allocproc(): context = 0x%x\n", p->context);
-	p->context->eip = (uint32_t)trapret;
+	p->context->eip = (uint32_t)forkret;
 
-	p->next = proc_list;
-	proc_list = p;
+	acquire(&ptable.lock);
+	p->next = ptable.proc;
+	ptable.proc = p;
+	release(&ptable.lock);
 
 	return p;
 }
 
-// create 1st usr proc
+/* Enter scheduler.
+ * NOTE: ptable.lock must be held and current->state already changed.
+ */
+static void sched()
+{
+	// TODO: add check is ptable.lock is holding.
+	// TODO: add check is current->state changed (!= RUNNING).
+	swtch(&current->context, kcontext);
+}
+
+/* It loops:
+ *  - choose process to run
+ *  - swtch to start running choosen process
+ *  - eventually that process transfers control via swtch back to scheduler
+ * NOTE: Only kernel context.
+ * NOTE: Never returns.
+ * TODO: Add compiler "never return".
+ */
+void scheduler()
+{
+	for(;;)
+	{
+		struct proc *p;
+
+		acquire(&ptable.lock);
+		for (p = ptable.proc; p != NULL; p = p->next)
+		{
+			if (p->state != RUNNABLE)
+				continue;
+
+			current = p;
+			switchvm(p);
+			p->state = RUNNING;
+			swtch(&kcontext, p->context);
+			switchkvm();
+			p->state = RUNNABLE;
+			current = NULL;
+		}
+		release(&ptable.lock);
+	}
+}
+
+// Creates 2 user proces
 void userinit()
 {
+	ptable.proc = NULL;
+
 	struct proc *p = allocproc();
 	p->pgdir = setupvm();
 	log_printf("debug: userinit(): process pde = 0x%x\n", p->pgdir);
@@ -126,3 +187,43 @@ void userinit()
 	p->state = RUNNABLE;
 }
 
+// Schedule next process.
+void yield()
+{
+	acquire(&ptable.lock);
+	current->state = RUNNABLE;
+	sched();
+	release(&ptable.lock);
+}
+
+/* Atomically release lock and sleep on chan.
+ * Reacquires lock when awakened.
+ */
+void sleep(void *chan, struct spinlock *lock)
+{
+	acquire(&ptable.lock);
+	release(lock);
+
+	current->chan = chan;
+	current->state = SLEEPING;
+
+	sched();
+
+	// Waking up
+	current->chan = NULL;
+	acquire(lock);
+	release(&ptable.lock);
+}
+
+// Wake up all processes sleeping on chan.
+void wakeup(void *chan)
+{
+	acquire(&ptable.lock);
+
+	struct proc *p;
+	for (p = ptable.proc; p != NULL; p = p->next)
+		if (p->state == SLEEPING && p->chan == chan)
+			p->state = RUNNABLE;
+
+	release(&ptable.lock);
+}

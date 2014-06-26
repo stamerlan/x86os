@@ -7,7 +7,7 @@
 #include <x86os/asm.h>
 #include <x86os/i8259.h>
 #include <x86os/log.h>
-#include <x86os/sched.h>
+#include <x86os/proc.h>
 
 static struct gatedesc idt[256];
 extern uint32_t vectors[];	// in vectors.S: array of 256 entry points

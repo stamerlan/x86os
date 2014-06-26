@@ -116,6 +116,7 @@ void kmap(struct pde *pde, void *phys, void *virt)
 	pte[(uint32_t)virt >> 12] = PTE(phys);
 }
 
+// Switch TSS and page table to correspond to process p.
 void switchvm(struct proc *p)
 {
 	pushcli();
@@ -127,5 +128,11 @@ void switchvm(struct proc *p)
 	ltr(SEG_TSS << 3);
 	wcr3((uint32_t)p->pgdir);
 	popcli();
+}
+
+// Switch page table register to the kernel page table
+void switchkvm()
+{
+	wcr3((uint32_t)kpde);
 }
 

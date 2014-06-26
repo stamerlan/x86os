@@ -8,6 +8,7 @@
 #include <x86os/types.h>
 #include <x86os/mm/page.h>
 #include <x86os/trap.h>
+#include <x86os/spinlock.h>
 
 struct context
 {
@@ -19,7 +20,7 @@ struct context
 };
 
 // TODO: Use define insted
-enum procstate { EMBRYO, RUNNABLE, RUNNING };
+enum procstate { EMBRYO, RUNNABLE, RUNNING, SLEEPING };
 
 // Per-process state
 struct proc
@@ -33,6 +34,7 @@ struct proc
 	struct proc *next;		// next proc in ptable
 	struct trapframe *tf;		// trap frame for current syscall
 	struct context *context;	// swtch() here to run process
+	void *chan;			// if nonzero, sleeping on chan
 };
 
 // TSS format
@@ -80,6 +82,10 @@ struct taskstate
 };
 
 void userinit();
+void scheduler();
+void yield();
+void sleep(void *chan, struct spinlock *lock);
+void wakeup(void *chan);
 
 #endif /* PROC_H */
 

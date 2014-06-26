@@ -20,7 +20,9 @@ typedef uint32_t		size_t;
  */
 typedef uint64_t sector_t;
 
-// Device number
+/* Device number
+ * NOTE: 0 - Invalid device number
+ */
 typedef uint32_t dev_t;
 
 /* Descriptor Privilege Level

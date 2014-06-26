@@ -15,6 +15,7 @@ void *kpagealloc(size_t pages);
 struct pde *setupvm();
 void kmap(struct pde *pde, void *phys, void *virt);
 void switchvm(struct proc *p);
+void switchkvm();
 
 #endif /* MM_H */
 

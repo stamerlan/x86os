@@ -3,7 +3,7 @@
 
 OUT	= block.o
 
-OBJS	= blk.o
+OBJS	= bio.o blk-dev.o
 
 CC	= gcc
 AS	= gas

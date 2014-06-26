@@ -7,7 +7,7 @@
 #include <x86os/i8259.h>
 #include <x86os/trap.h>
 #include <x86os/x86.h>
-#include <x86os/sched.h>
+#include <x86os/proc.h>
 
 void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
@@ -25,7 +25,7 @@ void kmain(long magic, void *mbi)
 	pushcli();
 	pic_enable(IRQ_TIMER);
 
-	sched();
+	scheduler();
 
 	for(;;);
 }
