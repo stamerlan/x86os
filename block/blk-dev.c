@@ -10,18 +10,18 @@
 #include <x86os/block/buf.h>
 
 // TODO: add device name
-struct blk_device
+struct block_device
 {
 	dev_t dev;
 	struct block_device_operations *ops;
-	struct blk_device *next;
+	struct block_device *next;
 };
 
 // TODO: add initialization
 static struct
 {
 	struct spinlock lock;
-	struct blk_device *head;
+	struct block_device *head;
 } blkdev_table;
 
 /* Returns device number
@@ -39,7 +39,7 @@ static dev_t alloc_devnr()
  */
 dev_t register_blkdev(struct block_device_operations *ops)
 {
-	struct blk_device *p = kmalloc(sizeof(struct blk_device));
+	struct block_device *p = kmalloc(sizeof(struct block_device));
 	if (!p)
 		return 0;
 	p->dev = alloc_devnr();
@@ -61,8 +61,8 @@ dev_t register_blkdev(struct block_device_operations *ops)
 void unregister_blkdev(dev_t dev)
 {
 	acquire(&blkdev_table.lock);
-	struct blk_device *p;
-	struct blk_device *prev = NULL;
+	struct block_device *p;
+	struct block_device *prev = NULL;
 	for (p = blkdev_table.head; p != NULL; prev = p, p = p->next)
 	{
 		if (p->dev == dev)
@@ -89,7 +89,7 @@ void do_blkread(struct buf *b)
 		return;
 	}
 
-	struct blk_device *p = NULL;
+	struct block_device *p = NULL;
 	acquire(&blkdev_table.lock);
 	for (p = blkdev_table.head; p != NULL; p = p->next)
 	{
@@ -120,7 +120,7 @@ void do_blkwrite(struct buf *b)
 		return;
 	}
 
-	struct blk_device *p = NULL;
+	struct block_device *p = NULL;
 	acquire(&blkdev_table.lock);
 	for (p = blkdev_table.head; p != NULL; p = p->next)
 	{
