@@ -7,17 +7,27 @@
 
 #include <x86os/types.h>
 
+struct file_system_type
+{
+	struct super_block *(*read_super)(struct super_block *);
+	char *name;
+
+	struct file_system_type *next;
+};
+
 /* Object super_block must be implemented for each file system. It describes
  * filesystem. It corresponds superblock, which stored in a special disk block.
  * File systems without superblock must generate it in a memory.
  */
 struct super_block
 {
-	dev_t		s_dev;
-	unsigned long	s_blocksize;	// Block size in bytes
-	struct dentry	*s_oot;
+	dev_t s_dev;
+	unsigned long s_blocksize;	// Block size in bytes
+	struct inode *s_covered;
+	struct inode * s_mounted;
 
 	struct super_operations *s_op;
+	void *s_fs_info;		// For driver use
 };
 
 struct super_operations
@@ -42,16 +52,16 @@ struct super_operations
  */
 struct inode
 {
-	unsigned long	i_no;
-	off_t		i_size;		// File size in bytes
-	unsigned long	i_blksize;	// Block size in bytes
-	unsigned long	i_blocks;	// File size in blocks
-	int		i_mode;		// Access rights
-	int		i_type;		// File type
+	unsigned long i_no;
+	off_t i_size;			// File size in bytes
+	unsigned long i_blksize;	// Block size in bytes
+	unsigned long i_blocks;		// File size in blocks
+	int i_mode;			// Access rights
+	int i_type;			// File type
 
 	struct inode_operations	*i_op;
-	struct file_operations	*i_fop;
-	struct super_block	*i_sb;
+	struct file_operations *i_fop;
+	struct super_block *i_sb;
 };
 
 struct inode_operations
@@ -104,10 +114,14 @@ struct dentry_operations
  */
 struct file
 {
-	struct dentry		*f_dentry;
-	struct file_operations	*f_op;
-	
-	off_t			f_pos;
+	off_t f_pos;
+	int f_flags;
+
+	int f_count;
+	struct spinlock_t f_lock;
+	struct dentry *f_dentry;
+	struct file_operations *f_op;
+	struct file *f_next, *f_prev;
 };
 
 struct file_operations

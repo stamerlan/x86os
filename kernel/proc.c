@@ -17,9 +17,9 @@
 struct 
 {
 	struct spinlock lock;
-	struct proc *proc;
+	struct task_struct *proc;
 } ptable;
-static struct proc *current;
+struct task_struct *current;
 static struct context *kcontext;
 
 extern void trapret();
@@ -47,8 +47,8 @@ static void *allocproc()
 {
 	static int nextpid = 1;
 
-	struct proc *p = kmalloc(sizeof(struct proc));
-	p->state = EMBRYO;
+	struct task_struct *p = kmalloc(sizeof(struct proc));
+	p->state = TASK_EMBRYO;
 	p->pid = nextpid++;
 	p->kstack = kpagealloc(KSTACK_SZ / PAGE_SZ);
 	log_printf("debug: allocproc(): kstack = 0x%x\n", p->kstack);
@@ -100,7 +100,7 @@ void scheduler()
 {
 	for(;;)
 	{
-		struct proc *p;
+		struct task_struct *p;
 
 		acquire(&ptable.lock);
 		for (p = ptable.proc; p != NULL; p = p->next)
@@ -110,10 +110,10 @@ void scheduler()
 
 			current = p;
 			switchvm(p);
-			p->state = RUNNING;
+			p->state = TASK_RUNNING;
 			swtch(&kcontext, p->context);
 			switchkvm();
-			p->state = RUNNABLE;
+			p->state = TASK_RUNNABLE;
 			current = NULL;
 		}
 		release(&ptable.lock);
@@ -125,7 +125,7 @@ void userinit()
 {
 	ptable.proc = NULL;
 
-	struct proc *p = allocproc();
+	struct task_struct *p = allocproc();
 	p->pgdir = setupvm();
 	log_printf("debug: userinit(): process pde = 0x%x\n", p->pgdir);
 	char *mem = kpagealloc(1);
@@ -139,21 +139,12 @@ void userinit()
 	p->tf->eflags = FL_IF;
 	p->tf->esp = PAGE_SZ;
 	p->tf->eip = 0;
-	// TODO: Remove this part
-	p->tf->eax = 0xAAAAAAAA;
-	p->tf->ebx = 0xBBBBBBBB;
-	p->tf->ecx = 0xCCCCCCCC;
-	p->tf->edx = 0xDDDDDDDD;
-	p->tf->edi = 0xD1D1D1D1;
-	p->tf->esi = 0xC1C1C1C1;
-	p->tf->ebp = 0xB0B0B0B0;
-	p->tf->gs = p->tf->fs = p->tf->ds;
 
 	p->parent = NULL;
 
 	memmove(mem, prog, sizeof(prog));
 
-	p->state = RUNNABLE;
+	p->state = TASK_RUNNABLE;
 
 	// Create 2nd usr proc
 	p = allocproc();
@@ -170,21 +161,12 @@ void userinit()
 	p->tf->eflags = FL_IF;
 	p->tf->esp = PAGE_SZ;
 	p->tf->eip = 0;
-	// TODO: Remove this part
-	p->tf->eax = 0xAAAAAAAA;
-	p->tf->ebx = 0xBBBBBBBB;
-	p->tf->ecx = 0xCCCCCCCC;
-	p->tf->edx = 0xDDDDDDDD;
-	p->tf->edi = 0xD1D1D1D1;
-	p->tf->esi = 0xC1C1C1C1;
-	p->tf->ebp = 0xB0B0B0B0;
-	p->tf->gs = p->tf->fs = p->tf->ds;
 
 	p->parent = NULL;
 
 	memmove(mem, prog2, sizeof(prog2));
 
-	p->state = RUNNABLE;
+	p->state = TASK_RUNNABLE;
 }
 
 // Schedule next process.
@@ -205,7 +187,7 @@ void sleep(void *chan, struct spinlock *lock)
 	release(lock);
 
 	current->chan = chan;
-	current->state = SLEEPING;
+	current->state = TASK_SLEEPING;
 
 	sched();
 
@@ -220,7 +202,7 @@ void wakeup(void *chan)
 {
 	acquire(&ptable.lock);
 
-	struct proc *p;
+	struct task_struct *p;
 	for (p = ptable.proc; p != NULL; p = p->next)
 		if (p->state == SLEEPING && p->chan == chan)
 			p->state = RUNNABLE;

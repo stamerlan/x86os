@@ -19,26 +19,32 @@ struct context
 	uint32_t eip;
 };
 
-// TODO: Use define insted
-enum procstate { EMBRYO, RUNNABLE, RUNNING, SLEEPING };
+#define TASK_RUNNABLE	0
+#define TASK_RUNNING	1
+#define TASK_EMBRYO	2
+#define TASK_SLEEPING	3
 
 // Per-process state
-struct proc
+struct task_struct
 {
-	uint32_t sz;			// size of process memory (bytes)
+	size_t sz;			// size of process memory (bytes)
 	struct pde* pgdir;		// page table
-	char *kstack;			// bottom of kstack for this proc
-	enum procstate state;		// process state
+	char *kstack;			// bottom of kstack for this process
+	int state;
+	int exit_code, exit_signal;
 	int pid;			// process ID
-	struct proc *parent;		// parent process
-	struct proc *next;		// next proc in ptable
 	struct trapframe *tf;		// trap frame for current syscall
 	struct context *context;	// swtch() here to run process
 	void *chan;			// if nonzero, sleeping on chan
+	int errno;
+	struct task_struct *parent;	// parent process
+	struct task_struct *next_task, *prev_task;
+	struct inode *pwd, *executable;
+	struct file* filp[NR_OPEN];
 };
 
 // TSS format
-struct taskstate
+struct tss_struct
 {
 	uint32_t link;		// old ts selector
 	uint32_t esp0;		// kstack ptr and selector
@@ -86,6 +92,8 @@ void scheduler();
 void yield();
 void sleep(void *chan, struct spinlock *lock);
 void wakeup(void *chan);
+
+extern struct task_struct *current;
 
 #endif /* PROC_H */
 

@@ -13,7 +13,10 @@
 /* Disk cache size (in sectors)
  * NOTE: sector is 512 bytes long
  */
-#define BUF_NR		10
+#define NR_BUF		10
+
+/* Per-process open files number */
+#define NR_OPEN		32
 
 #endif /* CONFIG_H */
 
