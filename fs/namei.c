@@ -63,7 +63,7 @@ int lookup(struct inode *dir, const char *name, int len, struct inode **result)
 	}
 	if (!len)
 	{
-		result = dir;
+		*result = dir;
 		return 0;
 	}
 	return dir->i_op->lookup(dir, name, len, result);
@@ -86,10 +86,11 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 	{
 		iput(base);
 		base = iget(current->root);
-		name++;
+		pathname++;
 	}
 	for(;;)
 	{
+		thisname = pathname;
 		for(len = 0; (c = *(pathname++)) && (c != '/'); len++)
 			/* nothing */ ;
 
@@ -130,7 +131,39 @@ int open_namei(const char *name, int flag, struct inode **inode)
 	iget(dir);
 	if (flag & O_CREAT)
 	{
-		// TODO: HERE
+		acquite(&dir->i_lock);
+		error = lookup(dir, basename, namelen, &inode);
+		if (!error)
+		{
+			if (flag & O_EXCL)
+			{
+				iput(inode);
+				error = -EEXIST;
+			}
+		}
+		else if (!permission(dir, MAY_WRITE | MAY_EXEC))
+			error = -EACCES;
+		else if (!dir->i_op || !dir->i_op->create)
+			error = -EACCES;
+		else if (IS_RDONLY(dir))
+			error = -EROFS;
+		else
+		{
+			iget(dir);
+			error = dir->i_op->create(dir, basename, namelen, mode,
+					res_inode);
+			release(&dir->i_lock);
+			iput(dir);
+			return error;
+		}
+		release(&dir->i_lock);
+	}
+	else
+		error = lookup(dir, basename, namelen, &inode);
+	if (error)
+	{
+		iput(dir);
+		return error;
 	}
 }
 
