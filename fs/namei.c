@@ -23,6 +23,7 @@ int permission(struct inode *inode, int mask)
 
 /* Looks up one part of a pathname, using the fs-dependent routinues for it.
  * It also checks for fathers (pseudo-roots, mount-points)
+ * NOTE: dir should be got already
  */
 int lookup(struct inode *dir, const char *name, int len, struct inode **result)
 {
@@ -69,7 +70,7 @@ int lookup(struct inode *dir, const char *name, int len, struct inode **result)
 	return dir->i_op->lookup(dir, name, len, result);
 }
 
-/* Returns the inode of the directory of the specified name) */
+/* Returns the inode of the directory of the specified name */
 static int dir_namei(const char *pathname, size_t *namelen, const char **name, 
 	struct inode * base, struct inode **res_inode)
 {
@@ -79,15 +80,17 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 	size_t len;
 
 	*res_inode = NULL;
-	if (!base)
-		base = iget(current->pwd);	// inc i_count. Returns inode
 
 	if ((c = *pathname) == '/')
 	{
-		iput(base);
-		base = iget(current->root);
+		base = current->root;
 		pathname++;
 	}
+	else
+	{
+		base = current->pwd;
+	}
+
 	for(;;)
 	{
 		thisname = pathname;
@@ -99,17 +102,14 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 
 		iget(base);
 		error = lookup(base, thisname, len, &inode);
-		if (error)
-		{
-			iput(base);
-			return error;
-		}
-	}
-	if (!base->i_op || !base->i_op->lookup)
-	{
 		iput(base);
-		return -ENOTDIR;
+		if (error)
+			return error;
+		base = inode;
 	}
+
+	if (!base->i_op || !base->i_op->lookup)
+		return -ENOTDIR;
 
 	*res_inode = base;
 	*namelen = len;
@@ -117,53 +117,23 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 	return 0;
 }
 
+// NOTE: on releasing inode should be put
 int open_namei(const char *name, int flag, struct inode **inode)
 {
 	int error;
-	struct inode *dir, *inode;
+	struct inode *dir;
 	size_t namelen;
 	const char *basename;
+
+	inode = NULL;
 
 	error = dir_namei(name, &namelen, &basename, NULL, &dir);
 	if (error)
 		return error;
 
 	iget(dir);
-	if (flag & O_CREAT)
-	{
-		acquite(&dir->i_lock);
-		error = lookup(dir, basename, namelen, &inode);
-		if (!error)
-		{
-			if (flag & O_EXCL)
-			{
-				iput(inode);
-				error = -EEXIST;
-			}
-		}
-		else if (!permission(dir, MAY_WRITE | MAY_EXEC))
-			error = -EACCES;
-		else if (!dir->i_op || !dir->i_op->create)
-			error = -EACCES;
-		else if (IS_RDONLY(dir))
-			error = -EROFS;
-		else
-		{
-			iget(dir);
-			error = dir->i_op->create(dir, basename, namelen, mode,
-					res_inode);
-			release(&dir->i_lock);
-			iput(dir);
-			return error;
-		}
-		release(&dir->i_lock);
-	}
-	else
-		error = lookup(dir, basename, namelen, &inode);
-	if (error)
-	{
-		iput(dir);
-		return error;
-	}
+	// TODO: flags
+	error = lookup(dir, basename, namelen, &inode);
+	return error;
 }
 

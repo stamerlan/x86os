@@ -51,5 +51,8 @@ int open(const char *name, int flags, int mode)
 		put_filp(f);
 		return error;
 	}
+
+	f->f_inode = inode;
+	f->f_pos = 0;
 }
 
