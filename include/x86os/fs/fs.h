@@ -6,14 +6,7 @@
 #define FS_H
 
 #include <x86os/types.h>
-
-struct file_system_type
-{
-	int (*read_super)(struct super_block *);
-	char *name;
-
-	struct file_system_type *next;
-};
+#include <x86os/spinlock.h>
 
 /* Object super_block must be implemented for each file system. It describes
  * filesystem. It corresponds superblock, which stored in a special disk block.
@@ -42,8 +35,7 @@ struct super_operations
 	void (*write_inode)(struct inode *inode);
 
 	// Write superblock to disk
-	void write_super(struct super_block *sb);
-
+	void (*write_super)(struct super_block *sb);
 };
 
 /* Object inode contains all information for manipulating files and directories.
@@ -53,11 +45,15 @@ struct super_operations
 struct inode
 {
 	unsigned long i_no;
+	dev_t i_dev;
 	off_t i_size;			// File size in bytes
 	unsigned long i_blksize;	// Block size in bytes
 	unsigned long i_blocks;		// File size in blocks
 	int i_mode;			// Access rights
 	int i_type;			// File type
+
+	unsigned int i_count;
+	struct spinlock i_lock;
 
 	struct inode *i_mount;		// root of mounted fs
 
@@ -68,17 +64,17 @@ struct inode
 
 struct inode_operations
 {
-	// Create new inode dentry in directory dir
-	int (*create)(struct inode *dir, struct dentry *dentry, int mode);
-	// Search for dentry in directory dir
-	struct dentry *(*lookup)(struct inode *dir, struct dentry *dentry);
-	// Create new directory dentry in directory dir
-	int (*mkdir)(struct inode *dir, struct dentry *dentry, int mode);
-	// Remove directory dentry from directory dir
-	int (*rmdir)(struct inode *dir, struct dentry *dentry);
-	// Move old_dentry from old_dir to new_dentry in new_dir
-	int (*rename)(struct inode *old_dir, struct dentry *old_dentry,
-			struct inode *new_dir, struct dentry *new_dentry);
+	// Create new inode in directory dir
+	int (*create)(struct inode *dir, char *name, int mode);
+	// Search for entry in directory dir
+	char *(*lookup)(struct inode *dir, char *enrty);
+	// Create new directory entry in directory dir
+	int (*mkdir)(struct inode *dir, char *entry, int mode);
+	// Remove directory entry from directory dir
+	int (*rmdir)(struct inode *dir, char *entry);
+	// Move old_entry from old_dir to new_entry in new_dir
+	int (*rename)(struct inode *old_dir, char *old_entry,
+			struct inode *new_dir, char *new_entry);
 };
 
 /* File object is used to represent opened by process files. Processes work with
@@ -111,6 +107,15 @@ struct file_operations
 	int (*open)(struct inode *inode, struct file *file);
 	// Invoked on file close
 	int (*release)(struct inode *inode, struct file *file);
+};
+
+/* File system type descriptor. Each fs driver have such object */
+struct file_system_type
+{
+	int (*read_super)(struct super_block *);
+	char *name;
+
+	struct file_system_type *next;
 };
 
 #endif /* FS_H */

@@ -2,7 +2,14 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
+#include <x86os/errno.h>
+#include <x86os/log.h>
+#include <x86os/proc.h>
 #include <x86os/fs/fs.h>
+#include <x86os/fs/filesystems.h>
+#include <x86os/fs/namei.h>
+#include <x86os/fs/inode.h>
+#include <x86os/fs/stat.h>
 
 // TODO: make list
 // TODO: locks
@@ -46,8 +53,9 @@ static struct super_block * get_super(dev_t dev)
 		return NULL;
 
 	for (i = 0; i < 10; i++)
-		if (super_blocks[i].s_deb == dev)
+		if (super_blocks[i].s_dev == dev)
 			return &super_blocks[i];
+	return NULL;
 }
 
 static struct super_block * read_super(dev_t dev, char *fstype)
@@ -88,34 +96,48 @@ static struct super_block * read_super(dev_t dev, char *fstype)
 int sys_mount(char *dev_name, char *dir_name, char *type)
 {
 	int error;
-	struct inode *inode;
+	struct inode *dev_inode, *dir_inode;
 	struct super_block *sb;
 
 	if (!suser())
 		return -EPERM;
 
-	error = namei(dev_name, &inode);
+	error = namei(dev_name, &dev_inode);
 	if (error)
 		return error;
-	if (inode->i_count != 1 || inode->i_mount)
+	if (dev_inode->i_count != 1 || dev_inode->i_mount)
 	{
-		iput(inode);
+		iput(dev_inode);
 		return -EBUSY;
 	}
-	if (!FS_ISDIR(inode))
+	if (!S_ISBLK(dev_inode->i_mode))
 	{
-		iput(inode);
+		iput(dev_inode);
+		return -ENOTBLK;
+	}
+
+	error = namei(dir_name, &dir_inode);
+	if (error)
+	{
+		iput(dev_inode);
+		return error;
+	}
+	if (!S_ISDIR(dir_inode->i_mode))
+	{
+		iput(dir_inode);
+		iput(dev_inode);
 		return -EPERM;
 	}
-	sb = read_super(inode->i_dev, type);
+	sb = read_super(dev_inode->i_dev, type);
 	if (!sb)
 	{
-		iput(inode);
+		iput(dir_inode);
+		iput(dev_inode);
 		return -EBUSY;
 	}
 
-	sb->s_covered = inode;
-	inode->i_mount = sb->s_root;
+	sb->s_covered = dir_inode;
+	dev_inode->i_mount = sb->s_root;
 
 	// TODO: umount should iput(inode)
 	return 0;

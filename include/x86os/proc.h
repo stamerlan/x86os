@@ -9,6 +9,9 @@
 #include <x86os/mm/page.h>
 #include <x86os/trap.h>
 #include <x86os/spinlock.h>
+#include <x86os/config.h>
+
+#define suser() (current->uid == 0)
 
 struct context
 {
@@ -37,6 +40,7 @@ struct task_struct
 	struct context *context;	// swtch() here to run process
 	void *chan;			// if nonzero, sleeping on chan
 	int errno;
+	uid_t uid;
 	struct task_struct *parent;	// parent process
 	struct task_struct *next_task, *prev_task;
 	struct inode *pwd, *executable;

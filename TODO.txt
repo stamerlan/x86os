@@ -1,0 +1,4 @@
+1. Make file formating (smth like linux kernel code-style)
+2. Define file types like pid_t, mode_t, uid_t
+3. kmalloc add some flags
+4. Add printk __attribute__ format

@@ -117,6 +117,31 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 	return 0;
 }
 
+// Returns inode of file name (inode already got)
+int namei(const char *name, struct inode **res_inode)
+{
+	int error;
+	size_t filenamelen;
+	const char *filename;
+	struct inode *dir, *inode;
+
+	*res_inode = NULL;
+
+	error = dir_namei(name, &filenamelen, &filename, &dir);
+	if (error)
+		return error;
+
+	iget(dir);
+	error = lookup(dir, filename, filenamelen, &inode);
+	iput(dir);
+	if (error)
+		return error;
+	
+	iget(inode);
+	*res_inode = inode;
+	return 0;
+}
+
 // NOTE: on releasing inode should be put
 int open_namei(const char *name, int flag, struct inode **inode)
 {

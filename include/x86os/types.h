@@ -11,8 +11,18 @@ typedef unsigned long long	uint64_t;
 typedef unsigned int		uint32_t;
 typedef unsigned short		uint16_t;
 typedef unsigned char		uint8_t;
+typedef signed long long	sint64_t;
+typedef signed int		sint32_t;
+typedef signed short		sint16_t;
+typedef signed char		sint8_t;
 
 typedef uint32_t		size_t;
+typedef sint32_t		ssize_t;
+
+/* Used for file sizes */
+typedef int			off_t;
+/* Used for user IDs */
+typedef unsigned int		uid_t;
 
 /* The type used for indexing onto a disc or disc partition.
  * x86os always considers sectors to be 512 bytes long independently of the
