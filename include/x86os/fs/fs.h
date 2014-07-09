@@ -9,7 +9,7 @@
 
 struct file_system_type
 {
-	struct super_block *(*read_super)(struct super_block *);
+	int (*read_super)(struct super_block *);
 	char *name;
 
 	struct file_system_type *next;
@@ -24,7 +24,7 @@ struct super_block
 	dev_t s_dev;
 	unsigned long s_blocksize;	// Block size in bytes
 	struct inode *s_covered;
-	struct inode * s_mounted;
+	struct inode * s_root;
 
 	struct super_operations *s_op;
 	void *s_fs_info;		// For driver use
@@ -58,6 +58,8 @@ struct inode
 	unsigned long i_blocks;		// File size in blocks
 	int i_mode;			// Access rights
 	int i_type;			// File type
+
+	struct inode *i_mount;		// root of mounted fs
 
 	struct inode_operations	*i_op;
 	struct file_operations *i_fop;

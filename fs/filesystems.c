@@ -12,6 +12,23 @@ static struct
 	struct file_system_type *head;
 } file_systems;
 
+struct file_system_type * get_fs_type(char *name)
+{
+	struct file_system_type *p;
+
+	acquire(&file_systems.lock);
+	p = file_systems.head;
+	while (p)
+	{
+		if (!strcmp(name, p->name))
+			return p;
+
+		p = p->next;
+	}
+
+	return NULL;
+}
+
 void register_filsystem_type(struct file_system_type *fs)
 {
 	acquire(&file_systems.lock);
