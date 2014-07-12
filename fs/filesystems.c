@@ -30,7 +30,7 @@ struct file_system_type * get_fs_type(char *name)
 	return NULL;
 }
 
-void register_filsystem_type(struct file_system_type *fs)
+void register_filesystem_type(struct file_system_type *fs)
 {
 	acquire(&file_systems.lock);
 	fs->next = file_systems.head;

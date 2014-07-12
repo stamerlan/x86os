@@ -13,7 +13,7 @@
 #include <x86os/mm/mm.h>
 
 static struct segdesc gdt[NR_SEGS];
-static struct taskstate ts;
+static struct tss_struct ts;
 
 static struct pde *kpde; 
 static char *free = (char*)0x200000;
@@ -117,11 +117,11 @@ void kmap(struct pde *pde, void *phys, void *virt)
 }
 
 // Switch TSS and page table to correspond to process p.
-void switchvm(struct proc *p)
+void switchvm(struct task_struct *p)
 {
 	pushcli();
 	gdt[SEG_TSS] = SEG16(STS_T32A, &ts,
-			sizeof(struct taskstate), DPL_SYS);
+			sizeof(struct tss_struct), DPL_SYS);
 	gdt[SEG_TSS].s = 0;
 	ts.ss0 = SEG_KDATA << 3;
 	ts.esp0 = (uint32_t)p->kstack + KSTACK_SZ;

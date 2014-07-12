@@ -22,7 +22,7 @@ static int permission(struct inode *inode, int mask)
 
 /* Looks up one part of a pathname, using the fs-dependent routinues for it.
  * It also checks for fathers (pseudo-roots, mount-points)
- * NOTE: dir should be got already
+ * NOTE: dir should be got already (iget())
  */
 static int lookup(struct inode *dir, const char *name, size_t len, 
 		struct inode **result)
@@ -72,13 +72,13 @@ static int lookup(struct inode *dir, const char *name, size_t len,
 
 /* Returns the inode of the directory of the specified name */
 static int dir_namei(const char *pathname, size_t *namelen, const char **name, 
-	struct inode * base, struct inode **res_inode)
+	struct inode **res_inode)
 {
 	char c;
 	const char *thisname;
 	int error;
 	size_t len;
-	struct inode *inode;
+	struct inode *inode, *base;
 
 	*res_inode = NULL;
 
@@ -153,13 +153,13 @@ int open_namei(const char *name, int flag, struct inode **inode)
 
 	inode = NULL;
 
-	error = dir_namei(name, &namelen, &basename, NULL, &dir);
+	error = dir_namei(name, &namelen, &basename, &dir);
 	if (error)
 		return error;
 
 	iget(dir);
 	// TODO: flags
-	error = lookup(dir, basename, namelen, &inode);
+	error = lookup(dir, basename, namelen, inode);
 	return error;
 }
 

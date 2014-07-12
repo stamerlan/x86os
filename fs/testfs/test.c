@@ -4,8 +4,9 @@
  * Test fs driver
  */
 
-#include <x86os/fs/filesystems.h>
 #include <x86os/log.h>
+#include <x86os/fs/fs.h>
+#include <x86os/fs/filesystems.h>
 
 static int read_super(struct super_block *s)
 {
@@ -16,11 +17,11 @@ static int read_super(struct super_block *s)
 	return 0;
 }
 
-static struct file_system_type
+static struct file_system_type testfs =
 {
 	.read_super = &read_super,
 	.name = "testfs",		
-}
+};
 
 void init_testfs()
 {

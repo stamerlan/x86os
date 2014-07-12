@@ -47,7 +47,7 @@ static void *allocproc()
 {
 	static int nextpid = 1;
 
-	struct task_struct *p = kmalloc(sizeof(struct proc));
+	struct task_struct *p = kmalloc(sizeof(struct task_struct));
 	p->state = TASK_EMBRYO;
 	p->pid = nextpid++;
 	p->kstack = kpagealloc(KSTACK_SZ / PAGE_SZ);
@@ -71,7 +71,9 @@ static void *allocproc()
 	p->context->eip = (uint32_t)forkret;
 
 	acquire(&ptable.lock);
-	p->next = ptable.proc;
+	p->next_task = ptable.proc;
+	p->prev_task = NULL;
+	ptable.proc->prev_task = p;
 	ptable.proc = p;
 	release(&ptable.lock);
 
@@ -103,9 +105,9 @@ void scheduler()
 		struct task_struct *p;
 
 		acquire(&ptable.lock);
-		for (p = ptable.proc; p != NULL; p = p->next)
+		for (p = ptable.proc; p != NULL; p = p->next_task)
 		{
-			if (p->state != RUNNABLE)
+			if (p->state != TASK_RUNNABLE)
 				continue;
 
 			current = p;
@@ -173,7 +175,7 @@ void userinit()
 void yield()
 {
 	acquire(&ptable.lock);
-	current->state = RUNNABLE;
+	current->state = TASK_RUNNABLE;
 	sched();
 	release(&ptable.lock);
 }
@@ -203,9 +205,9 @@ void wakeup(void *chan)
 	acquire(&ptable.lock);
 
 	struct task_struct *p;
-	for (p = ptable.proc; p != NULL; p = p->next)
-		if (p->state == SLEEPING && p->chan == chan)
-			p->state = RUNNABLE;
+	for (p = ptable.proc; p != NULL; p = p->next_task)
+		if (p->state == TASK_SLEEPING && p->chan == chan)
+			p->state = TASK_RUNNABLE;
 
 	release(&ptable.lock);
 }

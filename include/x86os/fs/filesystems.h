@@ -8,7 +8,7 @@
 #include <x86os/fs/fs.h>
 
 struct file_system_type * get_fs_type(char *name);
-void register_filsystem_type(struct file_system_type *fs);
+void register_filesystem_type(struct file_system_type *fs);
 void unregister_filesystem_type(struct file_system_type *fs);
 
 #endif /* FILESYSTEMS_H */
