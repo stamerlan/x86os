@@ -2,8 +2,9 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include <fs/fs.h>
-#include <spinlock.h>
+#include <x86os/fs/fs.h>
+#include <x86os/spinlock.h>
+#include <x86os/string.h>
 
 // TODO: initialization
 static struct
@@ -32,7 +33,7 @@ struct file_system_type * get_fs_type(char *name)
 void register_filsystem_type(struct file_system_type *fs)
 {
 	acquire(&file_systems.lock);
-	fs.next = file_systems.head;
+	fs->next = file_systems.head;
 	file_systems.head = fs;
 	release(&file_systems.lock);
 }

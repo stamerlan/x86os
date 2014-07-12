@@ -22,7 +22,7 @@ all:	$(OBJS)
 	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS) $(ARCHIVES)
 
 clean:
-	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
+	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
 	rm -f $(OBJS) $(OUT)
 
 .PHONY:	clean

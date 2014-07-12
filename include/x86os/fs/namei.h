@@ -2,10 +2,11 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#ifndef NAME_I
-#define NAME_I
+#ifndef NAMEI_H
+#define NAMEI_H
 
+int open_namei(const char *name, int flag, struct inode **inode);
 int namei(const char *name, struct inode **res_inode);
 
-#endif /* NAME_I */
+#endif /* NAMEI_H */
 

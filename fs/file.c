@@ -2,15 +2,16 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include <x86os/mm/mm.h>
 #include <x86os/types.h>
 #include <x86os/spinlock.h>
+#include <x86os/mm/mm.h>
+#include <x86os/fs/fs.h>
 
 // TODO: add initialization
 static struct
 {
 	struct file *head;
-	struct spinlock_t lock;
+	struct spinlock lock;
 } file_table;
 
 struct file * get_empty_filep()
@@ -36,7 +37,6 @@ struct file * get_empty_filep()
 	return f;
 }
 
-
 void put_filp(struct file *f)
 {
 	struct file *p, *prev;
@@ -45,7 +45,7 @@ void put_filp(struct file *f)
 	if (--f->f_count)
 	{
 		release(&f->f_lock);
-		break;
+		return;
 	}
 
 	acquire(&file_table.lock);
@@ -57,6 +57,7 @@ void put_filp(struct file *f)
 			prev->f_next = f->f_next;
 			f->f_next->f_prev = prev;
 
+			// TODO: Don't release, mark as free
 			// kfree(f)
 			break;
 		}

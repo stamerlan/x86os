@@ -5,6 +5,10 @@
 #include <x86os/types.h>
 #include <x86os/config.h>
 #include <x86os/proc.h>
+#include <x86os/errno.h>
+#include <x86os/fs/file.h>
+#include <x86os/fs/fs.h>
+#include <x86os/fs/namei.h>
 
 /* Open and possibly create a file or device.
  *
@@ -37,14 +41,14 @@ int open(const char *name, int flags, int mode)
 	if (fd >= NR_OPEN)
 		return -EMFILE;
 
-	f = get_empty_filp();
+	f = get_empty_filep();
 	if (!f)
 		return -ENFILE;
 
 	current->filp[fd] = f;
 	f->f_flags = flags;
 
-	error = open_namei(name, flags, mode, &inode);
+	error = open_namei(name, flags, &inode);
 	if (error)
 	{
 		current->filp[fd] = NULL;
@@ -54,5 +58,7 @@ int open(const char *name, int flags, int mode)
 
 	f->f_inode = inode;
 	f->f_pos = 0;
+
+	return 0;
 }
 

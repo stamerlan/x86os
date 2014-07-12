@@ -6,12 +6,11 @@
 #include <x86os/proc.h>
 #include <x86os/errno.h>
 #include <x86os/fs/fs.h>
+#include <x86os/fs/inode.h>
 
 /* Used to check read/write/execute permissions on a file */
-int permission(struct inode *inode, int mask)
+static int permission(struct inode *inode, int mask)
 {
-	int mode = inode->i_mode;
-
 	if (suser())
 		return 1;
 
@@ -25,7 +24,8 @@ int permission(struct inode *inode, int mask)
  * It also checks for fathers (pseudo-roots, mount-points)
  * NOTE: dir should be got already
  */
-int lookup(struct inode *dir, const char *name, int len, struct inode **result)
+static int lookup(struct inode *dir, const char *name, size_t len, 
+		struct inode **result)
 {
 	struct super_block *sb;
 	int perm;
@@ -43,7 +43,7 @@ int lookup(struct inode *dir, const char *name, int len, struct inode **result)
 			*result = dir;
 			return 0;
 		} 
-		else if ((sb = dir->i_sb) && (dir == sb->s_mounted))
+		else if ((sb = dir->i_sb) && (dir == sb->s_root))
 		{
 			iput(dir);
 			dir = iget(sb->s_covered);
@@ -78,6 +78,7 @@ static int dir_namei(const char *pathname, size_t *namelen, const char **name,
 	const char *thisname;
 	int error;
 	size_t len;
+	struct inode *inode;
 
 	*res_inode = NULL;
 

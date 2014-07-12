@@ -21,7 +21,7 @@ void iput(struct inode * inode)
 	{
 		log_printf("VFS: iput: trying to free free inode\n" \
 			"VFS: device %d, inode %d, mode = %d\n",
-			inode->i_dev, inode->i_ino, inode->i_mode);
+			inode->i_dev, inode->i_no, inode->i_mode);
 
 		release(&inode->i_lock);
 		return;
@@ -38,7 +38,7 @@ struct inode * iget(struct inode * inode)
 	if (!inode)
 	{
 		log_printf("VFS: iget: null ptr to inode\n");
-		return;
+		return NULL;
 	}
 
 	acquire(&inode->i_lock);

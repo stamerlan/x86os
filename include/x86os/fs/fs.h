@@ -8,6 +8,10 @@
 #include <x86os/types.h>
 #include <x86os/spinlock.h>
 
+#define MAY_EXEC	1
+#define MAY_WRITE	2
+#define MAY_READ	4
+
 /* Object super_block must be implemented for each file system. It describes
  * filesystem. It corresponds superblock, which stored in a special disk block.
  * File systems without superblock must generate it in a memory.
@@ -67,7 +71,8 @@ struct inode_operations
 	// Create new inode in directory dir
 	int (*create)(struct inode *dir, char *name, int mode);
 	// Search for entry in directory dir
-	char *(*lookup)(struct inode *dir, char *enrty);
+	int (*lookup)(struct inode *dir, const char *name, size_t namelen,
+			struct inode **result);
 	// Create new directory entry in directory dir
 	int (*mkdir)(struct inode *dir, char *entry, int mode);
 	// Remove directory entry from directory dir
@@ -75,6 +80,8 @@ struct inode_operations
 	// Move old_entry from old_dir to new_entry in new_dir
 	int (*rename)(struct inode *old_dir, char *old_entry,
 			struct inode *new_dir, char *new_entry);
+	// Check permission
+	int (*permission)(struct inode *ino, int mask); 
 };
 
 /* File object is used to represent opened by process files. Processes work with
@@ -89,6 +96,7 @@ struct file
 	struct inode *f_inode;
 
 	int f_count;
+	struct spinlock f_lock;
 	struct file_operations *f_op;
 	struct file *f_next, *f_prev;
 };

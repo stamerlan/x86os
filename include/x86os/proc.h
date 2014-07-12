@@ -43,7 +43,7 @@ struct task_struct
 	uid_t uid;
 	struct task_struct *parent;	// parent process
 	struct task_struct *next_task, *prev_task;
-	struct inode *pwd, *executable;
+	struct inode *pwd, *executable, *root;
 	struct file* filp[NR_OPEN];
 };
 
