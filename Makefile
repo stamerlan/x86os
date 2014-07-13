@@ -3,10 +3,12 @@
 
 SUBDIRS		= kernel \
 		  mm \
+		  block \
 		  fs \
 # TODO: Try to use $SUBDIRS instead duplication
 ARCHIVES	= kernel/kernel.o \
 		  mm/mm.o \
+		  block/block.o \
 		  fs/fs.o
 
 KERNELFILE	= tools/kernel

@@ -15,7 +15,7 @@
  *    than necessary
  *
  * The implementation uses three state flags internally:
- *  - B_BUSY:  the block has been returned from bread and gas not been passed
+ *  - B_BUSY:  the block has been returned from bread and has not been passed
  *             back to brelease
  *  - B_VALID: the buffer data has been read from the disk
  *  - B_DIRTY: the buffer data has been modified and needs to be written to disk
@@ -56,7 +56,7 @@ void binit()
 	p->flags = 0;
 	bcache.head = p;
 
-	for(i = 0; i < BUF_NR; i++)
+	for(i = 0; i < NR_BUF; i++)
 	{
 		// TODO: Flag MEM_FS
 		p = kmalloc(sizeof(struct buf));
@@ -77,8 +77,8 @@ void binit()
 	}
 }
 
-/* Look throught bcache for sector on dev. If not found, allocate fresh block. 
- * In any case, return B_BUSSY buffer
+/* Look throught bcache for sector on dev. If not found, allocate new block. 
+ * In any case, return B_BUSY buffer
  */
 static struct buf* bget(dev_t dev, sector_t sector)
 {
