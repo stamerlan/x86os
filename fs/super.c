@@ -11,6 +11,10 @@
 #include <x86os/fs/inode.h>
 #include <x86os/fs/stat.h>
 
+// TODO: Move it some where else
+// TODO: Does we realy need it?
+struct inode *root_inode;
+
 // TODO: make list
 // TODO: locks
 static struct super_block super_blocks[10];
@@ -19,16 +23,20 @@ static struct super_block * alloc_super(dev_t dev)
 {
 	size_t i;
 
+	log_printf("debug: alloc_super on %d\n", dev);
+
 	if (!dev)
 		return NULL;
 
 	for (i = 0; i < 10; i++)
 		if (!super_blocks[i].s_dev)
 		{
+			log_printf("debug: alloc_super: allocated %d sb\n", i);
 			super_blocks[i].s_dev = dev;
 			return &super_blocks[i];
 		}
 
+	log_printf("debug: alloc_super failed\n");
 	return NULL;
 }
 
@@ -82,12 +90,15 @@ static struct super_block * read_super(dev_t dev, char *fstype)
 
 	if (type->read_super)
 	{
-		if (!type->read_super(s))
+		if (type->read_super(s))
 		{
+			log_printf("debug: VFS: read_super error\n");
 			free_super(dev);
 			return NULL;
 		}
 	}
+
+	log_printf("debug: VFS: read_super finish\n");
 
 	return s;
 }
@@ -141,5 +152,32 @@ int sys_mount(char *dev_name, char *dir_name, char *type)
 
 	// TODO: umount should iput(inode)
 	return 0;
+}
+
+void mount_root(dev_t root_dev)
+{
+	log_printf("debug: vfs: mount root on %d\n", root_dev);
+
+	struct super_block *sb;
+	struct file_system_type *fs_type = get_filesystems();
+
+	while(fs_type != NULL)
+	{
+		sb = read_super(root_dev, fs_type->name);
+		if (sb)
+		{
+			root_inode = sb->s_root;
+
+			log_printf("VFS: mounted root (%s filesystem)\n",
+					fs_type->name);
+
+			return;
+		}
+
+		fs_type = fs_type->next;
+	}
+
+	// PANIC
+	log_printf("vfs: can not mount root\n");
 }
 

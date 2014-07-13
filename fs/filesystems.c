@@ -62,3 +62,9 @@ out:
 	release(&file_systems.lock);
 }
 
+// TODO: Remove it
+struct file_system_type *get_filesystems()
+{
+	return file_systems.head;
+}
+

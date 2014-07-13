@@ -10,5 +10,6 @@
 struct file_system_type * get_fs_type(char *name);
 void register_filesystem_type(struct file_system_type *fs);
 void unregister_filesystem_type(struct file_system_type *fs);
+struct file_system_type *get_filesystems();
 
 #endif /* FILESYSTEMS_H */

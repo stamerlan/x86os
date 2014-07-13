@@ -21,7 +21,7 @@ struct super_block
 	dev_t s_dev;
 	unsigned long s_blocksize;	// Block size in bytes
 	struct inode *s_covered;
-	struct inode * s_root;
+	struct inode *s_root;
 
 	struct super_operations *s_op;
 	void *s_fs_info;		// For driver use
