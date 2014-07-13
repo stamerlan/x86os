@@ -1,0 +1,6 @@
+*.swp
+*.o
+/kernel/vectors.S
+/System.map
+/tools/kernel
+/x86os.img
