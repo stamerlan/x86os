@@ -98,9 +98,8 @@ do_blkread(struct buf *b)
 		// Device wasn't found
 		return;
 	// TODO: IMPORTANT!!! do request before device unregistred 
-	p->ops->read(b);
-
-	b->flags |= B_VALID;
+	if (!p->ops->read(b))
+		b->flags |= B_VALID;
 }
 
 /* If B_DIRTY is set, invoke write function, set B_VALID and reset B_DIRTY
@@ -128,8 +127,8 @@ do_blkwrite(struct buf *b)
 		// Device wasn't found
 		return;
 	// TODO: IMPORTANT!!! do request before device unregistred 
-	p->ops->write(b);
-
-	b->flags &= ~B_DIRTY;
-	b->flags |= B_VALID;
+	if (!p->ops->write(b)) {
+		b->flags &= ~B_DIRTY;
+		b->flags |= B_VALID;
+	}
 }

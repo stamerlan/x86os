@@ -1,6 +1,9 @@
 # x86os
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
 
+SUBDIRS	= ram
+ARCHIVES = ram/ram.o
+
 OUT	= block.o
 
 OBJS	= bio.o blk-dev.o
@@ -15,9 +18,11 @@ CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
 LDFLAGS = -m elf_i386 -r
 
 all:	$(OBJS)
-	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS)
+	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
+	$(LD) $(LDFLAGS) -o $(OUT) $(ARCHIVES) $(OBJS)
 
 clean:
+	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
 	rm -f $(OBJS) $(OUT) *.c~
 
 .PHONY:	clean

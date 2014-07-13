@@ -12,6 +12,7 @@
 #include <x86os/fs/fs.h>
 
 void init_testfs();
+void init_ramdrv();
 
 void kmain(long magic, void *mbi) __attribute__ ((noreturn));
 void
@@ -25,6 +26,7 @@ kmain(long magic, void *mbi)
 	pushcli();
 	pic_enable(IRQ_TIMER);
 	binit();
+	init_ramdrv();
 
 	mount_root(1);
 	char buf[64];
