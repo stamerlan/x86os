@@ -20,9 +20,10 @@ typedef uint32_t		size_t;
 typedef sint32_t		ssize_t;
 
 /* Used for file sizes */
-typedef int			off_t;
-/* Used for user IDs */
+typedef unsigned long long	off_t;
 typedef unsigned int		uid_t;
+typedef unsigned int		gid_t;
+typedef int			mode_t;
 
 /* The type used for indexing onto a disc or disc partition.
  * x86os always considers sectors to be 512 bytes long independently of the

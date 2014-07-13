@@ -10,6 +10,7 @@
 #include <x86os/trap.h>
 #include <x86os/spinlock.h>
 #include <x86os/config.h>
+#include <x86os/fs/node.h>
 
 #define suser() (current->uid == 0)
 
@@ -43,8 +44,7 @@ struct task_struct
 	uid_t uid;
 	struct task_struct *parent;	// parent process
 	struct task_struct *next_task, *prev_task;
-	struct inode *pwd, *executable, *root;
-	struct file* filp[NR_OPEN];
+	struct fs_node *pwd;
 };
 
 // TSS format

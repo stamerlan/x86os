@@ -18,5 +18,8 @@
 /* Per-process open files number */
 #define NR_OPEN		32
 
+/* Max path len */
+#define MAX_PATH	255
+
 #endif /* CONFIG_H */
 

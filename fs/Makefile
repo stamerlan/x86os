@@ -3,10 +3,7 @@
 
 OUT	= fs.o
 
-SUBDIRS	= testfs
-OBJS	= super.o file.o filesystems.o inode.o open.o namei.o
-# TODO: Try to use $SUBDIRS instead duplication
-ARCHIVES= testfs/testfs.o
+OBJS	= vfs.o nname.o testfs.o
 
 CC	= gcc
 AS	= gas
@@ -18,11 +15,9 @@ CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
 LDFLAGS = -m elf_i386 -r
 
 all:	$(OBJS)
-	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i; done
-	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS) $(ARCHIVES)
+	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS)
 
 clean:
-	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
 	rm -f $(OBJS) $(OUT)
 
 .PHONY:	clean
