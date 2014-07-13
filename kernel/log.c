@@ -1,12 +1,5 @@
 /* File: log.c
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- *
- * TODO: use bochs 0xE9 port for output
- * TODO: use ring buffer for messages
- * TODO: remove any console output
- * TODO: looks like smth with console scrolling
- * TODO: add print for 64-bit numbers
- * TODO: create own stdarg.h (add blackjack and whores)
  */
 
 #define LOG_WIDTH	80
@@ -17,11 +10,7 @@
 #include <x86os/log.h>
 #include <x86os/asm.h>
 
-/* Reads cursor pos from bios mem
- * NOTE: Should be called before any log operations
- */
-
-// Copy char to video ram, text attribute = 7, moves cursor
+// Char to bochs debagger
 static void kputc(char c)
 {
 	outb(0xe9, c);

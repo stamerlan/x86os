@@ -32,7 +32,7 @@ void kmain(long magic, void *mbi)
 	sys_read("/test", buf, 64);
 	log_printf("debug: read from fs: %s\n", buf);
 
-	//scheduler();
+	scheduler();
 
 	for(;;);
 }
