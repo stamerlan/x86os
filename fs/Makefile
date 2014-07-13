@@ -18,7 +18,7 @@ all:	$(OBJS)
 	$(LD) $(LDFLAGS) -o $(OUT) $(OBJS)
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm -f $(OBJS) $(OUT) *.c~
 
 .PHONY:	clean
 

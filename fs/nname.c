@@ -12,19 +12,17 @@
 // TODO: may be move it to vfs.c?
 extern struct fs_node *root;
 
-struct fs_node *get_node(const char *filename)
+struct fs_node *
+get_node(const char *filename)
 {
 	struct fs_node *base;
 	size_t i, p, namelen;
 	char path[MAX_PATH + 1];
 
-	if (filename[0] == '/')
-	{
+	if (filename[0] == '/') {
 		base = root;
 		filename++;
-	}
-	else
-	{
+	} else {
 		base = current->pwd;
 	}
 
@@ -36,10 +34,8 @@ struct fs_node *get_node(const char *filename)
 
 	i = 0;
 	p = 0;
-	while (i < namelen)
-	{
-		if (path[i] != '/')
-		{
+	while (i < namelen) {
+		if (path[i] != '/') {
 			i++;
 			continue;
 		}
@@ -51,12 +47,11 @@ struct fs_node *get_node(const char *filename)
 		p = ++i;
 	}
 	// last component maybe
-	if (i != p)
-	{
+	if (i != p) {
 		path[i] = '\0';
-		log_printf("debug: get_node: path = %s, lookup addr = 0x%x, " \
-			"base = %d\n", &path[p], &base->op->lookup, 
-			(int)base->data);
+		log_printf("debug: get_node: path = %s, lookup addr = 0x%x, "
+			   "base = %d\n", &path[p], &base->op->lookup,
+			   (int) base->data);
 		base = base->op->lookup(base, &path[p]);
 		if (!base)
 			return NULL;
@@ -64,4 +59,3 @@ struct fs_node *get_node(const char *filename)
 
 	return base;
 }
-

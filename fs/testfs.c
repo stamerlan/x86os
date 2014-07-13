@@ -10,40 +10,40 @@
 #include <x86os/fs/filesystems.h>
 
 static const char msg[] = "Hello from testfs driver!\n";
-static const size_t msg_len = sizeof(msg);
+static const size_t msg_len = sizeof (msg);
 static struct fs_node *lookup(struct fs_node *node, const char *entry);
 static ssize_t read(struct fs_node *node, char *buf, size_t count);
 
-static struct node_operations ops =
-{
+static struct node_operations ops = {
 	.read = read,
 	.lookup = lookup,
 };
 
-static struct fs_node fs[2] = 
-{
-	{0, (void*)1, NULL, &ops},
-	{0, (void*)2, NULL, &ops},
+static struct fs_node fs[2] = {
+	{0, (void *) 1, NULL, &ops},
+	{0, (void *) 2, NULL, &ops},
 };
 
-static ssize_t read(struct fs_node *node, char *buf, size_t count)
+static ssize_t
+read(struct fs_node *node, char *buf, size_t count)
 {
-	if ((int)node->data != 2)
+	if ((int) node->data != 2)
 		return -EFAULT;
 
 	if (count > msg_len)
 		count = msg_len;
 
-	memmove(buf, (const void*)&msg, count);
+	memmove(buf, (const void *) &msg, count);
 	return count;
 }
 
-static struct fs_node *lookup(struct fs_node *node, const char *entry)
+static struct fs_node *
+lookup(struct fs_node *node, const char *entry)
 {
 	log_printf("debug: testfs: lookup: node = %d, entry = %s\n",
-			(int)node->data, entry);
+		   (int) node->data, entry);
 
-	if ((int)node->data != 1)
+	if ((int) node->data != 1)
 		return NULL;
 
 	if (!strcmp(entry, "test"))
@@ -52,15 +52,15 @@ static struct fs_node *lookup(struct fs_node *node, const char *entry)
 	return NULL;
 }
 
-static struct fs_node *get_root(dev_t dev)
+static struct fs_node *
+get_root(dev_t dev)
 {
 	log_printf("testfs: get_root on %d\n", dev);
 
 	return &fs[0];
-}	
+}
 
-struct file_system_type testfs =
-{
+struct file_system_type testfs = {
 	.name = "testfs",
 	.get_root = &get_root,
 };

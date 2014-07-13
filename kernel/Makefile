@@ -26,7 +26,7 @@ vectors.S:	vectors.pl
 	$(PERL) vectors.pl > vectors.S
 
 clean:
-	rm -f $(OBJS) $(OUT) vectors.S
+	rm -f $(OBJS) $(OUT) vectors.S *.c~
 
 .PHONY:	clean
 

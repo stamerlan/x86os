@@ -1,8 +1,6 @@
-1. Make file formating (smth like linux kernel code-style)
-2. kmalloc add some flags (look at linux kernel)
-3. Add printk __attribute__ format
-4. Add git ignore list
-5. minixfs driver
-6. ext2 driver
-7. Make vfs code more common
-8. Disk driver
+1. kmalloc add some flags (look at linux kernel)
+2. Add printk __attribute__ format
+3. minixfs driver
+4. ext2 driver
+5. Make vfs code more common
+6. Disk driver

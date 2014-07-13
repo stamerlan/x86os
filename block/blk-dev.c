@@ -10,16 +10,14 @@
 #include <x86os/block/buf.h>
 
 // TODO: add device name
-struct block_device
-{
+struct block_device {
 	dev_t dev;
 	struct block_device_operations *ops;
 	struct block_device *next;
 };
 
 // TODO: add initialization
-static struct
-{
+static struct {
 	struct spinlock lock;
 	struct block_device *head;
 } blkdev_table;
@@ -27,7 +25,8 @@ static struct
 /* Returns device number
  * TODO: Handle dev_t overflow
  */
-static dev_t alloc_devnr()
+static dev_t
+alloc_devnr()
 {
 	static dev_t nr = 1;
 
@@ -37,14 +36,14 @@ static dev_t alloc_devnr()
 /* Registers block device
  * TODO: Multiple devices registration at once
  */
-dev_t register_blkdev(struct block_device_operations *ops)
+dev_t
+register_blkdev(struct block_device_operations * ops)
 {
-	struct block_device *p = kmalloc(sizeof(struct block_device));
+	struct block_device *p = kmalloc(sizeof (struct block_device));
 	if (!p)
 		return 0;
 	p->dev = alloc_devnr();
-	if (!p->dev)
-	{
+	if (!p->dev) {
 		// TODO: invoke kfree(p)
 		return 0;
 	}
@@ -58,15 +57,14 @@ dev_t register_blkdev(struct block_device_operations *ops)
 	return p->dev;
 }
 
-void unregister_blkdev(dev_t dev)
+void
+unregister_blkdev(dev_t dev)
 {
 	acquire(&blkdev_table.lock);
 	struct block_device *p;
 	struct block_device *prev = NULL;
-	for (p = blkdev_table.head; p != NULL; prev = p, p = p->next)
-	{
-		if (p->dev == dev)
-		{
+	for (p = blkdev_table.head; p != NULL; prev = p, p = p->next) {
+		if (p->dev == dev) {
 			prev->next = p->next;
 
 			// TODO: invoke kfree(p)
@@ -78,21 +76,20 @@ void unregister_blkdev(dev_t dev)
 /* If B_VALID isn't set, invoke read function, set B_VALID
  * NOTE: Buffer must be busy
  */
-void do_blkread(struct buf *b)
+void
+do_blkread(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC
 		log_printf("panic: do_blkread: buf isn't busy\n");
-	if (b->flags & B_VALID)
-	{
+	if (b->flags & B_VALID) {
 		log_printf("debug: do_blkread: nothing to do\n");
 		return;
 	}
 
 	struct block_device *p = NULL;
 	acquire(&blkdev_table.lock);
-	for (p = blkdev_table.head; p != NULL; p = p->next)
-	{
+	for (p = blkdev_table.head; p != NULL; p = p->next) {
 		if (p->dev == b->dev)
 			break;
 	}
@@ -109,21 +106,20 @@ void do_blkread(struct buf *b)
 /* If B_DIRTY is set, invoke write function, set B_VALID and reset B_DIRTY
  * NOTE: Buffer must be busy
  */
-void do_blkwrite(struct buf *b)
+void
+do_blkwrite(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC
 		log_printf("panic: do_blkwrite: buf isn't busy\n");
-	if (!(b->flags & B_DIRTY))
-	{
+	if (!(b->flags & B_DIRTY)) {
 		log_printf("debug: do_blkwrite: nothing to do\n");
 		return;
 	}
 
 	struct block_device *p = NULL;
 	acquire(&blkdev_table.lock);
-	for (p = blkdev_table.head; p != NULL; p = p->next)
-	{
+	for (p = blkdev_table.head; p != NULL; p = p->next) {
 		if (p->dev == b->dev)
 			break;
 	}
@@ -137,4 +133,3 @@ void do_blkwrite(struct buf *b)
 	b->flags &= ~B_DIRTY;
 	b->flags |= B_VALID;
 }
-

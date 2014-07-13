@@ -17,24 +17,28 @@
  */
 static uint16_t irqmask = 0xFFFF & ~(1 << IRQ_SLAVE);
 
-static void pic_setmask(uint16_t mask)
+static void
+pic_setmask(uint16_t mask)
 {
 	irqmask = mask;
 	outb(IO_PIC1 + 1, mask);
 	outb(IO_PIC2 + 1, mask >> 8);
 }
 
-void pic_enable(int irq)
+void
+pic_enable(int irq)
 {
 	pic_setmask(irqmask & ~(1 << irq));
 }
 
-void pic_disable(int irq)
+void
+pic_disable(int irq)
 {
 	pic_setmask(irqmask | (1 << irq));
 }
 
-void pic_init()
+void
+pic_init()
 {
 	// mask all interrupts
 	outb(IO_PIC1 + 1, 0xFF);
@@ -65,24 +69,23 @@ void pic_init()
 	outb(IO_PIC1 + 1, 0x3);
 
 	// setup slave (8259A-2)
-	outb(IO_PIC2, 0x11);		// ICW1
+	outb(IO_PIC2, 0x11);	// ICW1
 	outb(IO_PIC2 + 1, T_IRQ0 + 8);	// ICW2
 	outb(IO_PIC2 + 1, IRQ_SLAVE);	// ICW3
 	// NB Automatic EOI mode doesn't tend to work on the slave.
 	// Linux source code says it's "to be investigated".
-	outb(IO_PIC2+1, 0x3);		// ICW4
+	outb(IO_PIC2 + 1, 0x3);	// ICW4
 
 	// OCW3:  0ef01prs
 	//   ef:  0x = NOP, 10 = clear specific mask, 11 = set specific mask
 	//    p:  0 = no polling, 1 = polling mode
 	//   rs:  0x = NOP, 10 = read IRR, 11 = read ISR
-	outb(IO_PIC1, 0x68);		// clear specific mask
-	outb(IO_PIC1, 0x0a);		// read IRR by default
+	outb(IO_PIC1, 0x68);	// clear specific mask
+	outb(IO_PIC1, 0x0a);	// read IRR by default
 
-	outb(IO_PIC2, 0x68);		// OCW3
-	outb(IO_PIC2, 0x0a);		// OCW3
+	outb(IO_PIC2, 0x68);	// OCW3
+	outb(IO_PIC2, 0x0a);	// OCW3
 
-	if(irqmask != 0xFFFF)
-		pic_setmask(irqmask);  
+	if (irqmask != 0xFFFF)
+		pic_setmask(irqmask);
 }
-

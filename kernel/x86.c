@@ -7,18 +7,19 @@
 
 static int ncli = 0;
 
-void pushcli()
+void
+pushcli()
 {
 	cli();
 
 	ncli++;
 }
 
-void popcli()
+void
+popcli()
 {
 	if (--ncli < 0)
 		log_printf("panic: popcli()\n");
 	if (ncli == 0)
 		sti();
 }
-

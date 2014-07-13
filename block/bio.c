@@ -31,21 +31,20 @@
 #include <x86os/mm/mm.h>
 
 // TODO: Add initialization
-static struct 
-{
+static struct {
 	struct spinlock lock;
 	struct buf *head;
 } bcache;
 
-void binit()
+void
+binit()
 {
 	size_t i;
 	struct buf *p;
 
 	// TODO: Flag MEM_FS
-	p = kmalloc(sizeof(struct buf));
-	if (!p)
-	{
+	p = kmalloc(sizeof (struct buf));
+	if (!p) {
 		// PANIC
 		log_printf("panic: binit\n");
 		return;
@@ -56,12 +55,10 @@ void binit()
 	p->flags = 0;
 	bcache.head = p;
 
-	for(i = 0; i < NR_BUF; i++)
-	{
+	for (i = 0; i < NR_BUF; i++) {
 		// TODO: Flag MEM_FS
-		p = kmalloc(sizeof(struct buf));
-		if (!p)
-		{
+		p = kmalloc(sizeof (struct buf));
+		if (!p) {
 			// PANIC
 			log_printf("panic: binit\n");
 			return;
@@ -80,20 +77,18 @@ void binit()
 /* Look throught bcache for sector on dev. If not found, allocate new block. 
  * In any case, return B_BUSY buffer
  */
-static struct buf* bget(dev_t dev, sector_t sector)
+static struct buf *
+bget(dev_t dev, sector_t sector)
 {
 	struct buf *p;
 
 	acquire(&bcache.lock);
 
-loop:
+      loop:
 	// Is the sector already cached?
-	for (p = bcache.head; p != NULL; p = p->next)
-	{
-		if (p->dev == dev && p->sector == sector)
-		{
-			if (!(p->flags & B_BUSY))
-			{
+	for (p = bcache.head; p != NULL; p = p->next) {
+		if (p->dev == dev && p->sector == sector) {
+			if (!(p->flags & B_BUSY)) {
 				p->flags |= B_BUSY;
 				release(&bcache.lock);
 				return p;
@@ -105,10 +100,8 @@ loop:
 	}
 
 	// Noncached
-	for (p = bcache.head; p != NULL; p = p->next)
-	{
-		if (!(p->flags & B_BUSY) && !(p->flags & B_DIRTY))
-		{
+	for (p = bcache.head; p != NULL; p = p->next) {
+		if (!(p->flags & B_BUSY) && !(p->flags & B_DIRTY)) {
 			p->dev = dev;
 			p->sector = sector;
 			p->flags = B_BUSY;
@@ -116,14 +109,15 @@ loop:
 			return p;
 		}
 	}
-	
+
 	// PANIC
 	log_printf("panic: no buffers\n");
 	return NULL;
 }
 
 // Return a B_BUSY buf with the contents of the indicated disk sector
-struct buf *bread(dev_t dev, sector_t sector)
+struct buf *
+bread(dev_t dev, sector_t sector)
 {
 	struct buf *p;
 
@@ -136,7 +130,8 @@ struct buf *bread(dev_t dev, sector_t sector)
 }
 
 // Writes buf contents to disk. Must be B_BUSY
-void bwrite(struct buf *buf)
+void
+bwrite(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC
@@ -148,7 +143,8 @@ void bwrite(struct buf *buf)
 }
 
 // Release a B_BUSY buffer
-void brelease(struct buf *buf)
+void
+brelease(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC
@@ -159,4 +155,3 @@ void brelease(struct buf *buf)
 	wakeup(buf);
 	release(&bcache.lock);
 }
-

@@ -12,23 +12,24 @@
 static struct gatedesc idt[256];
 extern uint32_t vectors[];	// in vectors.S: array of 256 entry points
 
-void idt_init()
+void
+idt_init()
 {
 	int i;
 	for (i = 0; i < 256; i++)
 		SETGATE(idt[i], 0, SEG_KCODE << 3, vectors[i], DPL_SYS);
 	SETGATE(idt[T_SYSCALL], 1, SEG_KCODE << 3, vectors[T_SYSCALL], DPL_USR);
 	// TODO: remove me
-	SETGATE(idt[T_SYSCALL + 1], 1, SEG_KCODE << 3, vectors[T_SYSCALL + 1], 
-			DPL_USR);
+	SETGATE(idt[T_SYSCALL + 1], 1, SEG_KCODE << 3, vectors[T_SYSCALL + 1],
+		DPL_USR);
 
-	lidt(idt, sizeof(idt));
+	lidt(idt, sizeof (idt));
 }
 
-void trap(struct trapframe* tf)
+void
+trap(struct trapframe *tf)
 {
-	switch (tf->trapno)
-	{
+	switch (tf->trapno) {
 	case T_IRQ0 + IRQ_TIMER:
 		yield();
 		break;
@@ -42,4 +43,3 @@ void trap(struct trapframe* tf)
 		log_printf("unhandled trap 0x%x\n", tf->trapno);
 	}
 }
-

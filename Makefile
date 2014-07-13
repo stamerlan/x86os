@@ -23,6 +23,8 @@ BOCHS		= /opt/bochs/bin/bochs
 QEMUOPTS	= -smp 1 -m 32
 BOCHSCONF	= bochs.conf
 
+INDENT_PARAM	= -kr -i8 -ts8 -sob -l80 -ss -bs -psl
+
 # TODO: What about ldscript?
 # TODO: $(STRIP) -s $(KERNELFILE)
 LDFLAGS		= -m elf_i386 -Ttext 0x100000
@@ -44,8 +46,11 @@ qemu:	img
 bochs:	img
 	$(BOCHS) -f $(BOCHSCONF) -q
 
+precommit:
+	indent $(INDENT_PARAM) `find . -name "*.c"`
+
 clean:
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
 	rm -f $(IMG) System.map $(KERNELFILE)
 
-.PHONY:	clean qemu bochs img
+.PHONY:	clean qemu bochs img precommit

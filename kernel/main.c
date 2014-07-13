@@ -13,8 +13,9 @@
 
 void init_testfs();
 
-void kmain(long magic, void *mbi) __attribute__((noreturn));
-void kmain(long magic, void *mbi)
+void kmain(long magic, void *mbi) __attribute__ ((noreturn));
+void
+kmain(long magic, void *mbi)
 {
 	mm_init();
 	pic_init();
@@ -32,6 +33,5 @@ void kmain(long magic, void *mbi)
 
 	scheduler();
 
-	for(;;);
+	for (;;) ;
 }
-
