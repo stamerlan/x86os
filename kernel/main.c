@@ -16,7 +16,6 @@ void kmain(long magic, void *mbi) __attribute__((noreturn));
 void kmain(long magic, void *mbi)
 {
 	// TODO: move after mm_init
-	log_init();
 	mm_init();
 
 	log_printf("x86os starting:\n\n");
@@ -33,7 +32,7 @@ void kmain(long magic, void *mbi)
 	sys_read("/test", buf, 64);
 	log_printf("debug: read from fs: %s\n", buf);
 
-	scheduler();
+	//scheduler();
 
 	for(;;);
 }

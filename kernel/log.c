@@ -17,80 +17,14 @@
 #include <x86os/log.h>
 #include <x86os/asm.h>
 
-static unsigned char xpos = 0;
-static unsigned char ypos = 0;
-// TODO: use define instead
-static char *video = (char *)0xb8000;
-
 /* Reads cursor pos from bios mem
  * NOTE: Should be called before any log operations
  */
-void log_init()
-{
-	xpos = *((unsigned char *) 0x450);
-	ypos = *((unsigned char *) 0x451);
-}
-
-// Fills all video memory with '\0'
-void log_clear()
-{
-	unsigned int i;
-	for (i = 0; i < LOG_WIDTH * LOG_HEIGHT * 2; i++)
-		video[i * 2] = '\0';
-}
-
-// Setups xpos, ypos, scrolles screen if necessary, sets cursor pos
-static void log_newline()
-{
-	xpos = 0;
-
-	if (ypos == LOG_HEIGHT) {
-		// Scrolling
-		unsigned int i;
-		for (i = 0; i < LOG_WIDTH * (LOG_HEIGHT - 1) * 2; i++)
-			video[i] = video[i + LOG_WIDTH * 2];
-		// Clear last line
-		for (i = LOG_WIDTH * (LOG_HEIGHT - 1) * 2; 
-			i < LOG_WIDTH * LOG_HEIGHT * 2; i++)
-			video[i] = '\0';
-	} else {
-		ypos++;
-	}
-}
-
-// Moves cursor to positon (xpos, ypos)
-static void log_move_cursor()
-{
-	uint16_t pos = ypos * LOG_WIDTH + xpos;
-	outb(0x3d4, 14);
-	outb(0x3d5, pos >> 8);
-	outb(0x3d4, 15);
-	outb(0x3d5, pos);
-}
 
 // Copy char to video ram, text attribute = 7, moves cursor
-void log_putc(char c)
+static void kputc(char c)
 {
-	switch (c) {
-	case '\n':
-		log_newline();
-		break;
-	case '\t':
-		xpos += 8 - (xpos % 8);
-
-		if (xpos >= LOG_WIDTH)
-			log_newline();
-		break;
-	default:
-		video[(ypos * LOG_WIDTH + xpos) * 2] = c;
-		video[(ypos * LOG_WIDTH + xpos) * 2 + 1] =0x07;
-
-		xpos++;
-		if (xpos == LOG_WIDTH)
-			log_newline();
-		break;
-	}
-	log_move_cursor();
+	outb(0xe9, c);
 }
 
 // Print string to log
@@ -98,7 +32,7 @@ void log_puts(char *s)
 {
 	char *p = s;
 	while (*p != '\0') {
-		log_putc(*p);
+		kputc(*p);
 		p++;
 	}
 }
@@ -168,12 +102,12 @@ void log_printf(char *fmt, ...)
 				} while ((u /= base) > 0);
 
 				if (negative)
-					log_putc('-');
+					kputc('-');
 			}
 
 			log_puts(s);
 		} else {
-			log_putc(c);
+			kputc(c);
 		}
 	}
 	va_end(argp);
