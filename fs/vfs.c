@@ -28,6 +28,7 @@ void mount_root(dev_t root_dev)
 		{
 			log_printf("vfs: root fs mounted (%s filesystem)\n",
 					filesystems[i]->name);
+			log_printf("debug: root = %d\n", (int)root->data);
 			return;
 		}
 	}
@@ -37,7 +38,7 @@ void mount_root(dev_t root_dev)
 	return;
 }
 
-int open(const char *filename, int flags, mode_t mode)
+int sys_open(const char *filename, int flags, mode_t mode)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -47,7 +48,7 @@ int open(const char *filename, int flags, mode_t mode)
 	return node->op->open(node, flags, mode);
 }
 
-ssize_t read(const char *filename, char *buf, size_t count)
+ssize_t sys_read(const char *filename, char *buf, size_t count)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -57,7 +58,7 @@ ssize_t read(const char *filename, char *buf, size_t count)
 	return node->op->read(node, buf, count);
 }
 
-ssize_t write(const char *filename, char *buf, size_t count)
+ssize_t sys_write(const char *filename, char *buf, size_t count)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -67,7 +68,7 @@ ssize_t write(const char *filename, char *buf, size_t count)
 	return node->op->write(node, buf, count);
 }
 
-int close(const char *filename)
+int sys_close(const char *filename)
 {
 	struct fs_node *node = get_node(filename);
 

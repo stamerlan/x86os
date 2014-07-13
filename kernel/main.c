@@ -8,7 +8,7 @@
 #include <x86os/trap.h>
 #include <x86os/x86.h>
 #include <x86os/proc.h>
-#include <x86os/fs/super.h>
+#include <x86os/fs/fs.h>
 
 void init_testfs();
 
@@ -28,10 +28,12 @@ void kmain(long magic, void *mbi)
 	pushcli();
 	pic_enable(IRQ_TIMER);
 
-	init_testfs();
 	mount_root(1);
+	char buf[64];
+	sys_read("/test", buf, 64);
+	log_printf("debug: read from fs: %s\n", buf);
 
-	//scheduler();
+	scheduler();
 
 	for(;;);
 }

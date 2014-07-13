@@ -24,6 +24,11 @@ static inline void outb(uint16_t port, uint8_t data)
 	asm volatile("out %0, %1" : : "a"(data), "d"(port));
 }
 
+static inline void outw(uint16_t port, uint16_t data)
+{
+	asm volatile("out %0, %1" : : "a"(data), "d"(port));
+}
+
 static inline void lgdt(struct segdesc* d, size_t sz)
 {
 	volatile struct 

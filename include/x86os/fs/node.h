@@ -26,10 +26,10 @@ struct node_operations
 	int (*close)(struct fs_node *node);
 
 	/* Directories only */
-	struct fs_node* (*lookup)(struct fs_node *node, char *entry);
-	int (*create)(struct fs_node *node, char *entry, 
+	struct fs_node* (*lookup)(struct fs_node *node, const char *entry);
+	int (*create)(struct fs_node *node, const char *entry, 
 		struct fs_node *new_node);
-	int (*remove)(struct fs_node *node, char *entry);
+	int (*remove)(struct fs_node *node, const char *entry);
 };
 
 #endif /* NODE_H */

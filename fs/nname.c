@@ -6,10 +6,11 @@
 #include <x86os/string.h>
 #include <x86os/types.h>
 #include <x86os/proc.h>
+#include <x86os/log.h>
 #include <x86os/fs/node.h>
 
 // TODO: may be move it to vfs.c?
-extern struct fs_node root;
+extern struct fs_node *root;
 
 struct fs_node *get_node(const char *filename)
 {
@@ -19,7 +20,7 @@ struct fs_node *get_node(const char *filename)
 
 	if (filename[0] == '/')
 	{
-		base = &root;
+		base = root;
 		filename++;
 	}
 	else
@@ -53,6 +54,9 @@ struct fs_node *get_node(const char *filename)
 	if (i != p)
 	{
 		path[i] = '\0';
+		log_printf("debug: get_node: path = %s, lookup addr = 0x%x, " \
+			"base = %d\n", &path[p], &base->op->lookup, 
+			(int)base->data);
 		base = base->op->lookup(base, &path[p]);
 		if (!base)
 			return NULL;

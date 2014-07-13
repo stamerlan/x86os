@@ -11,6 +11,20 @@
 
 static const char msg[] = "Hello from testfs driver!\n";
 static const size_t msg_len = sizeof(msg);
+static struct fs_node *lookup(struct fs_node *node, const char *entry);
+static ssize_t read(struct fs_node *node, char *buf, size_t count);
+
+static struct node_operations ops =
+{
+	.read = read,
+	.lookup = lookup,
+};
+
+static struct fs_node fs[2] = 
+{
+	{0, (void*)1, NULL, &ops},
+	{0, (void*)2, NULL, &ops},
+};
 
 static ssize_t read(struct fs_node *node, char *buf, size_t count)
 {
@@ -22,18 +36,21 @@ static ssize_t read(struct fs_node *node, char *buf, size_t count)
 
 	memmove(buf, (const void*)&msg, count);
 	return count;
-}	
+}
 
-static struct node_operations ops =
+static struct fs_node *lookup(struct fs_node *node, const char *entry)
 {
-	.read = read,
-};
+	log_printf("debug: testfs: lookup: node = %d, entry = %s\n",
+			(int)node->data, entry);
 
-static struct fs_node fs[2] = 
-{
-	{0, (void*)1, NULL, &ops},
-	{0, (void*)2, NULL, &ops},
-};
+	if ((int)node->data != 1)
+		return NULL;
+
+	if (!strcmp(entry, "test"))
+		return &fs[1];
+
+	return NULL;
+}
 
 static struct fs_node *get_root(dev_t dev)
 {
