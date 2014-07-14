@@ -10,6 +10,7 @@
 #include <x86os/types.h>
 #include <x86os/mm/seg.h>
 #include <x86os/trap.h>
+#include <x86os/string.h>
 
 static inline uint8_t inb(uint16_t port)
 {
@@ -112,6 +113,14 @@ static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
 			"1"(newval) : "cc");
 
 	return result;
+}
+
+//string in port; DS must point segment descriptor containing string
+static inline void outsb(uint16_t port, char *s)
+{
+	size_t n = strlen(s);
+	asm volatile("cld\n\t"
+			"rep outsb" :: "S"(s), "d"(port), "c"(n));
 }
 
 #endif /* ASM_H */

@@ -10,7 +10,7 @@
 #include <x86os/log.h>
 #include <x86os/asm.h>
 
-// Char to bochs debagger
+// Char to bochs debugger
 static void
 kputc(char c)
 {
@@ -18,14 +18,10 @@ kputc(char c)
 }
 
 // Print string to log
-void
-log_puts(char *s)
+static void
+kputs(char *s)
 {
-	char *p = s;
-	while (*p != '\0') {
-		kputc(*p);
-		p++;
-	}
+	outsb(0xe9, s);
 }
 
 /* Format and print string to log
@@ -97,7 +93,7 @@ log_printf(char *fmt, ...)
 					kputc('-');
 			}
 
-			log_puts(s);
+			kputs(s);
 		} else {
 			kputc(c);
 		}
