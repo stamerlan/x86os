@@ -1,7 +1,11 @@
 #/bin/bash
 
-./get-programs.sh
-./get-libs.sh
-./install-smartgithg-6.0.4.sh
-./install-bochs-2.6.5.sh
+FILENAME=`readlink -e "$0"`
+DIRNAME=`dirname "$FILENAME"`
+
+$DIRNAME/get-programs.sh
+$DIRNAME/get-libs.sh
+$DIRNAME/config-vim.sh
+$DIRNAME/install-smartgithg-6.0.4.sh
+$DIRNAME/install-bochs-2.6.5.sh
 

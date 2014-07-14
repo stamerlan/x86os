@@ -1,6 +1,7 @@
 *.swp
 *.o
 *.c~
+/tags
 /kernel/vectors.S
 /System.map
 /tools/kernel

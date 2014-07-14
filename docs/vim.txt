@@ -1,0 +1,27 @@
+Quick guide to VIM
+
+Before using autocompletion type:
+	make ctags
+It create tags-file, which contain all references.
+
+Code autocompletion: Ctrl + Space
+Tree file view: :NERDTree
+Switch windows: Ctrl + w + w
+Save: <F2>
+New Tab: <F4>
+Prev Tab: <F5>
+Next Tab: <F6>
+Open file at cursor: <F8>
+Return to prev File: Ctrl + o
+Run menu: <F9>
+Exit menu: <F10>
+
+Start edit text: i
+Return to command mode: <Esc>
+Visual mode: v
+Copy selected (visual mode): y
+Cut selected (visual mode): x
+Paste: p
+
+Remove line: dd
+Close all: :qa

@@ -1,0 +1,108 @@
+" Игнорировать регистр при поиске
+set ic
+" Подсвечиавть поиск
+set hls
+" Использовать инкрементальный поиск
+set is
+
+" Ширина текста
+"set textwidth=80
+" Размер табуляции
+set tabstop=8
+set softtabstop=8
+set shiftwidth=8
+set noexpandtab
+" Автоотступ в стиле C
+set cin
+
+" Отображение выполняемой команды
+set showcmd
+
+" Перенос длинных строк
+set wrap
+" Что показать перед перенесенной строкой
+set showbreak=...  
+
+" Искать дополнительный .vimrc в текущей рабочей директории. Таким образом, мы 
+" можем иметь один файлик в корне каждого проекта с его специфическими настройками.
+set exrc
+" Запрещает внешним .vimrc писать что-то в файлы, выполнять комманды шелла и 
+" отображает маппинги, которые создаются.
+set secure
+
+" Сохранить кое-что при выходе
+"  '10  : 10 предыдущих закладок
+"  "100 : 100 строк для каждого регистра
+"  :20  : 20 строк командной строки
+"  %    : список буферов
+"  n... : путь к viminfo
+if has("viminfo")
+	set viminfo='10,\"100,:20,%,n~/.viminfo
+endif
+" Восстановление положения курсора при открытии файла
+if has("autocmd")
+	function! ResCur()
+		if line("'\"") <= line("$")
+			normal!1 g`"
+			return 1
+		endif
+	endfunction
+
+	set viewoptions=cursor,folds
+"	au BufWinLeave * mkview
+"	au BufWinEnter * silent loadview
+	au BufWinEnter * call ResCur()
+endif
+
+" Скрол колесиком мыши и вставка на СКМ
+set mouse=a
+map <S-Insert> <MiddleMouse>
+map! <S-Insert> <MiddleMouse>
+
+" Сохранение по F2
+imap <F2> <Esc>:w<CR>
+map <F2> <Esc>:w<CR>
+" F4 - новая вкладка
+imap <F4> <Esc>:tabnew<CR>
+map <F4> <Esc>:tabnew<CR>
+" F5 - переключение вкладок справа-налево
+imap <F5> <Esc>:tabprev<CR>i
+map <F5> :tabprev<CR>
+" F6 - переключение вкладок слева-направо
+imap <F6> <Esc>:tabnext<CR>i
+map <F6> :tabnext<CR>
+" F8 - открыть файл под курсором
+inoremap <F8> <Esc> gf
+noremap <F8> gf
+
+" F9 - меню приложений
+set wildmenu
+set wcm=<Tab>
+menu Exec.make       :!make<CR>
+menu Exec.make_clean :!make clean<CR>
+menu Exec.bash       :!/bin/bash<CR>
+map <F9> :emenu Exec.<Tab>
+
+" F10 - пользовательское меню
+set wildmenu
+set wcm=<Tab>
+menu Exit.quit      :wq<CR>
+menu Exit.quit!     :q!<CR>
+menu Exit.save      :w<CR>
+map <F10> :emenu Exit.<Tab>
+
+" Можно добавлять каталоги с плагинами таким образом
+"set runtimepath+=,/usr/share/vim-scripts/
+
+" Включение Omni completion
+filetype plugin on
+set omnifunc=syntaxcomplete#Complete
+
+" Ctrl + Space -  Подсказка omni completion
+inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
+\ "\<lt>C-n>" :
+\ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
+\ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
+\ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
+imap <C-@> <C-Space>
+

@@ -49,8 +49,14 @@ bochs:	img
 precommit:
 	indent $(INDENT_PARAM) `find . -name "*.c"`
 
+ctags:
+	ctags -R
+
 clean:
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
-	rm -f $(IMG) System.map $(KERNELFILE)
+	rm -f $(KERNELFILE)
 
-.PHONY:	clean qemu bochs img precommit
+distclean:	clean
+	rm -f $(IMG) System.map tags
+
+.PHONY:	clean distclean qemu bochs img precommit
