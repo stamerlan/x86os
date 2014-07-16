@@ -6,6 +6,7 @@
 #define BUF_H
 
 #include <x86os/types.h>
+#include <x86os/list.h>
 
 struct buf
 {
@@ -13,9 +14,7 @@ struct buf
 	dev_t dev;
 	sector_t sector;
 
-	// TODO: Use rb-tree instead
-	struct buf *prev;
-	struct buf *next;
+	struct list_head bufs;
 
 	char data[512];
 };

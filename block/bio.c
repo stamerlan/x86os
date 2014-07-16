@@ -29,12 +29,12 @@
 #include <x86os/block/buf.h>
 #include <x86os/block/blk-dev.h>
 #include <x86os/mm/mm.h>
+#include <x86os/list.h>
 
 // TODO: Add initialization
-// TODO: Use struct list_head instead
 static struct {
 	struct spinlock lock;
-	struct buf *head;
+	struct list_head head;
 } bcache;
 
 void
@@ -43,6 +43,8 @@ binit()
 	size_t i;
 	struct buf *p;
 
+	INIT_LIST_HEAD(&bcache.head);
+
 	// TODO: Flag MEM_FS
 	p = kmalloc(sizeof (struct buf));
 	if (!p) {
@@ -50,11 +52,9 @@ binit()
 		log_printf("panic: binit\n");
 		return;
 	}
-	p->next = NULL;
-	p->prev = NULL;
 	p->dev = 0;
 	p->flags = 0;
-	bcache.head = p;
+	list_add(&p->bufs, &bcache.head);
 
 	for (i = 0; i < NR_BUF; i++) {
 		// TODO: Flag MEM_FS
@@ -64,14 +64,9 @@ binit()
 			log_printf("panic: binit\n");
 			return;
 		}
-
-		p->next = bcache.head;
-		p->prev = 0;
 		p->dev = 0;
 		p->flags = 0;
-
-		bcache.head->prev = p;
-		bcache.head = p;
+		list_add(&p->bufs, &bcache.head);
 	}
 }
 
@@ -85,23 +80,26 @@ bget(dev_t dev, sector_t sector)
 
 	spin_lock(&bcache.lock);
 
-loop:
-	// Is the sector already cached?
-	for (p = bcache.head; p != NULL; p = p->next) {
-		if (p->dev == dev && p->sector == sector) {
-			if (!(p->flags & B_BUSY)) {
-				p->flags |= B_BUSY;
-				spin_unlock(&bcache.lock);
-				return p;
+	for(;;) {
+		// Is the sector already cached?
+		list_for_each_entry(p, &bcache.head, bufs) {
+			if (p->dev == dev && p->sector == sector) {
+				if (!(p->flags & B_BUSY)) {
+					p->flags |= B_BUSY;
+					spin_unlock(&bcache.lock);
+					return p;
+				}
+				// Buf is busy, wait for brelease
+				sleep(p, &bcache.lock);
+				continue;	// search for buffer again
 			}
-			// Buf is busy, wait for brelease
-			sleep(p, &bcache.lock);
-			goto loop;	// search for buffer again
 		}
+
+		break;
 	}
 
 	// Noncached
-	for (p = bcache.head; p != NULL; p = p->next) {
+	list_for_each_entry(p, &bcache.head, bufs) {
 		if (!(p->flags & B_BUSY) && !(p->flags & B_DIRTY)) {
 			p->dev = dev;
 			p->sector = sector;

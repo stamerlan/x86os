@@ -8,20 +8,19 @@
 #include <x86os/mm/mm.h>
 #include <x86os/block/blk-dev.h>
 #include <x86os/block/buf.h>
+#include <x86os/list.h>
 
 // TODO: add device name
-// TODO: use struct list_head
 struct block_device {
 	dev_t dev;
 	struct block_device_operations *ops;
-	struct block_device *next;
+	struct list_head bdevs;
 };
 
 // TODO: add initialization
-// TODO: use struct list_head
 static struct {
 	struct spinlock lock;
-	struct block_device *head;
+	struct list_head head;
 } blkdev_table;
 
 /* Returns device number
@@ -52,8 +51,7 @@ register_blkdev(struct block_device_operations * ops)
 	p->ops = ops;
 
 	spin_lock(&blkdev_table.lock);
-	p->next = blkdev_table.head;
-	blkdev_table.head = p->next;
+	list_add(&p->bdevs, &blkdev_table.head);
 	spin_unlock(&blkdev_table.lock);
 
 	return p->dev;
@@ -64,10 +62,10 @@ unregister_blkdev(dev_t dev)
 {
 	spin_lock(&blkdev_table.lock);
 	struct block_device *p;
-	struct block_device *prev = NULL;
-	for (p = blkdev_table.head; p != NULL; prev = p, p = p->next) {
+
+	list_for_each_entry(p, &blkdev_table.head, bdevs) {
 		if (p->dev == dev) {
-			prev->next = p->next;
+			list_del(&p->bdevs);
 
 			// TODO: invoke kfree(p)
 			goto out;
@@ -93,12 +91,13 @@ do_blkread(struct buf *b)
 
 	struct block_device *p = NULL;
 	spin_lock(&blkdev_table.lock);
-	for (p = blkdev_table.head; p != NULL; p = p->next) {
+	//for (p = blkdev_table.head; p != NULL; p = p->next) {
+	list_for_each_entry(p, &blkdev_table.head, bdevs) {
 		if (p->dev == b->dev)
 			break;
 	}
 	spin_unlock(&blkdev_table.lock);
-	if (!p)
+	if (&p->bdevs == &blkdev_table.head)
 		// Device wasn't found
 		return;
 	// TODO: IMPORTANT!!! do request before device unregistred 
@@ -122,12 +121,13 @@ do_blkwrite(struct buf *b)
 
 	struct block_device *p = NULL;
 	spin_lock(&blkdev_table.lock);
-	for (p = blkdev_table.head; p != NULL; p = p->next) {
+	//for (p = blkdev_table.head; p != NULL; p = p->next) {
+	list_for_each_entry(p, &blkdev_table.head, bdevs) {
 		if (p->dev == b->dev)
 			break;
 	}
 	spin_unlock(&blkdev_table.lock);
-	if (!p)
+	if (&p->bdevs == &blkdev_table.head)
 		// Device wasn't found
 		return;
 	// TODO: IMPORTANT!!! do request before device unregistred 

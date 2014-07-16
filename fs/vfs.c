@@ -1,6 +1,6 @@
 /* File: vfs.c
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
- * TODO: Check is functions implemented in driver
+ * TODO: Check are functions implemented in driver
  */
 
 #include <x86os/types.h>
