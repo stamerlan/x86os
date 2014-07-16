@@ -12,8 +12,9 @@ struct spinlock
 	uint32_t locked;
 };
 
-void acquire(struct spinlock *lock);
-void release(struct spinlock *lock);
+void spin_lock_init(struct spinlock *lock);
+void spin_lock(struct spinlock *lock);
+void spin_unlock(struct spinlock *lock);
 
 #endif /* SPINLOCK_H */
 

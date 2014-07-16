@@ -31,6 +31,7 @@
 #include <x86os/mm/mm.h>
 
 // TODO: Add initialization
+// TODO: Use struct list_head instead
 static struct {
 	struct spinlock lock;
 	struct buf *head;
@@ -82,15 +83,15 @@ bget(dev_t dev, sector_t sector)
 {
 	struct buf *p;
 
-	acquire(&bcache.lock);
+	spin_lock(&bcache.lock);
 
-      loop:
+loop:
 	// Is the sector already cached?
 	for (p = bcache.head; p != NULL; p = p->next) {
 		if (p->dev == dev && p->sector == sector) {
 			if (!(p->flags & B_BUSY)) {
 				p->flags |= B_BUSY;
-				release(&bcache.lock);
+				spin_unlock(&bcache.lock);
 				return p;
 			}
 			// Buf is busy, wait for brelease
@@ -105,7 +106,7 @@ bget(dev_t dev, sector_t sector)
 			p->dev = dev;
 			p->sector = sector;
 			p->flags = B_BUSY;
-			release(&bcache.lock);
+			spin_unlock(&bcache.lock);
 			return p;
 		}
 	}
@@ -150,8 +151,8 @@ brelease(struct buf *buf)
 		// PANIC
 		log_printf("panic: brelease\n");
 
-	acquire(&bcache.lock);
+	spin_lock(&bcache.lock);
 	buf->flags &= ~B_BUSY;
 	wakeup(buf);
-	release(&bcache.lock);
+	spin_unlock(&bcache.lock);
 }

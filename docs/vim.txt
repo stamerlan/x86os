@@ -25,3 +25,5 @@ Paste: p
 
 Remove line: dd
 Close all: :qa
+
+Filesystem menu(command mode at tree winodw): m

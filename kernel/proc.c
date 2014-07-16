@@ -12,11 +12,12 @@
 #include <x86os/x86.h>
 #include <x86os/log.h>
 #include <x86os/spinlock.h>
+#include <x86os/list.h>
 
 // Process list
 struct {
 	struct spinlock lock;
-	struct task_struct *proc;
+	struct list_head proc;
 } ptable;
 struct task_struct *current;
 static struct context *kcontext;
@@ -35,7 +36,7 @@ static char prog2[] = { 0xcd, 0x41, 0xeb, 0xfc };
 static void
 forkret()
 {
-	release(&ptable.lock);
+	spin_unlock(&ptable.lock);
 
 	// Return to trapret
 }
@@ -71,12 +72,9 @@ allocproc()
 	log_printf("debug: allocproc(): context = 0x%x\n", p->context);
 	p->context->eip = (uint32_t) forkret;
 
-	acquire(&ptable.lock);
-	p->next_task = ptable.proc;
-	p->prev_task = NULL;
-	ptable.proc->prev_task = p;
-	ptable.proc = p;
-	release(&ptable.lock);
+	spin_lock(&ptable.lock);
+	list_add(&p->tasks, &ptable.proc);
+	spin_unlock(&ptable.lock);
 
 	return p;
 }
@@ -106,8 +104,8 @@ scheduler()
 	for (;;) {
 		struct task_struct *p;
 
-		acquire(&ptable.lock);
-		for (p = ptable.proc; p != NULL; p = p->next_task) {
+		spin_lock(&ptable.lock);
+		list_for_each_entry(p, &ptable.proc, tasks) {
 			if (p->state != TASK_RUNNABLE)
 				continue;
 
@@ -119,7 +117,7 @@ scheduler()
 			p->state = TASK_RUNNABLE;
 			current = NULL;
 		}
-		release(&ptable.lock);
+		spin_unlock(&ptable.lock);
 	}
 }
 
@@ -127,7 +125,7 @@ scheduler()
 void
 userinit()
 {
-	ptable.proc = NULL;
+	INIT_LIST_HEAD(&ptable.proc);
 
 	struct task_struct *p = allocproc();
 	p->pgdir = setupvm();
@@ -177,10 +175,10 @@ userinit()
 void
 yield()
 {
-	acquire(&ptable.lock);
+	spin_lock(&ptable.lock);
 	current->state = TASK_RUNNABLE;
 	sched();
-	release(&ptable.lock);
+	spin_unlock(&ptable.lock);
 }
 
 /* Atomically release lock and sleep on chan.
@@ -189,8 +187,8 @@ yield()
 void
 sleep(void *chan, struct spinlock *lock)
 {
-	acquire(&ptable.lock);
-	release(lock);
+	spin_lock(&ptable.lock);
+	spin_unlock(lock);
 
 	current->chan = chan;
 	current->state = TASK_SLEEPING;
@@ -199,20 +197,20 @@ sleep(void *chan, struct spinlock *lock)
 
 	// Waking up
 	current->chan = NULL;
-	acquire(lock);
-	release(&ptable.lock);
+	spin_lock(lock);
+	spin_unlock(&ptable.lock);
 }
 
 // Wake up all processes sleeping on chan.
 void
 wakeup(void *chan)
 {
-	acquire(&ptable.lock);
-
 	struct task_struct *p;
-	for (p = ptable.proc; p != NULL; p = p->next_task)
+
+	spin_lock(&ptable.lock);
+	list_for_each_entry(p, &ptable.proc, tasks) {
 		if (p->state == TASK_SLEEPING && p->chan == chan)
 			p->state = TASK_RUNNABLE;
-
-	release(&ptable.lock);
+	}
+	spin_unlock(&ptable.lock);
 }

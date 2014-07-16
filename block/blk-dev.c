@@ -10,6 +10,7 @@
 #include <x86os/block/buf.h>
 
 // TODO: add device name
+// TODO: use struct list_head
 struct block_device {
 	dev_t dev;
 	struct block_device_operations *ops;
@@ -17,6 +18,7 @@ struct block_device {
 };
 
 // TODO: add initialization
+// TODO: use struct list_head
 static struct {
 	struct spinlock lock;
 	struct block_device *head;
@@ -49,10 +51,10 @@ register_blkdev(struct block_device_operations * ops)
 	}
 	p->ops = ops;
 
-	acquire(&blkdev_table.lock);
+	spin_lock(&blkdev_table.lock);
 	p->next = blkdev_table.head;
 	blkdev_table.head = p->next;
-	release(&blkdev_table.lock);
+	spin_unlock(&blkdev_table.lock);
 
 	return p->dev;
 }
@@ -60,7 +62,7 @@ register_blkdev(struct block_device_operations * ops)
 void
 unregister_blkdev(dev_t dev)
 {
-	acquire(&blkdev_table.lock);
+	spin_lock(&blkdev_table.lock);
 	struct block_device *p;
 	struct block_device *prev = NULL;
 	for (p = blkdev_table.head; p != NULL; prev = p, p = p->next) {
@@ -68,9 +70,11 @@ unregister_blkdev(dev_t dev)
 			prev->next = p->next;
 
 			// TODO: invoke kfree(p)
-			return;
+			goto out;
 		}
 	}
+out:
+	spin_unlock(&blkdev_table.lock);
 }
 
 /* If B_VALID isn't set, invoke read function, set B_VALID
@@ -88,12 +92,12 @@ do_blkread(struct buf *b)
 	}
 
 	struct block_device *p = NULL;
-	acquire(&blkdev_table.lock);
+	spin_lock(&blkdev_table.lock);
 	for (p = blkdev_table.head; p != NULL; p = p->next) {
 		if (p->dev == b->dev)
 			break;
 	}
-	release(&blkdev_table.lock);
+	spin_unlock(&blkdev_table.lock);
 	if (!p)
 		// Device wasn't found
 		return;
@@ -117,12 +121,12 @@ do_blkwrite(struct buf *b)
 	}
 
 	struct block_device *p = NULL;
-	acquire(&blkdev_table.lock);
+	spin_lock(&blkdev_table.lock);
 	for (p = blkdev_table.head; p != NULL; p = p->next) {
 		if (p->dev == b->dev)
 			break;
 	}
-	release(&blkdev_table.lock);
+	spin_unlock(&blkdev_table.lock);
 	if (!p)
 		// Device wasn't found
 		return;
