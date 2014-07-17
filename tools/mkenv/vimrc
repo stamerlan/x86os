@@ -75,21 +75,23 @@ map <F6> :tabnext<CR>
 inoremap <F8> <Esc> gf
 noremap <F8> gf
 
-" F9 - меню приложений
+" F9 - меню сборки
 set wildmenu
 set wcm=<Tab>
 menu Exec.make       :!make<CR>
+menu Exec.make_bochs :!make bochs<CR>
+menu Exec.make_qemu  :!make qemu<CR>
+menu Exec.make_img   :!make img<CR>
 menu Exec.make_clean :!make clean<CR>
-menu Exec.bash       :!/bin/bash<CR>
 map <F9> :emenu Exec.<Tab>
 
-" F10 - пользовательское меню
+" F10 - меню git
 set wildmenu
 set wcm=<Tab>
-menu Exit.quit      :wq<CR>
-menu Exit.quit!     :q!<CR>
-menu Exit.save      :w<CR>
-map <F10> :emenu Exit.<Tab>
+menu Git.commit      :!git add --all && git commit -a -t tools/commit-template.txt<CR>
+menu Git.push        :!git push<CR>
+menu Git.pull        :!git pull<CR>
+map <F10> :emenu Git.<Tab>
 
 " Можно добавлять каталоги с плагинами таким образом
 "set runtimepath+=,/usr/share/vim-scripts/
@@ -106,3 +108,6 @@ inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
 \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
 imap <C-@> <C-Space>
 
+" Подсветка 80 столбца
+set colorcolumn=80
+hi ColorColumn ctermbg=lightgrey guibg=lightgrey
