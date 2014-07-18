@@ -9,6 +9,7 @@
 #include <x86os/types.h>
 #include <x86os/log.h>
 #include <x86os/asm.h>
+#include <stdarg.h>
 
 // Char to bochs debugger
 static void

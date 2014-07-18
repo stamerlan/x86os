@@ -115,7 +115,7 @@ static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
 	return result;
 }
 
-//string in port; DS must point segment descriptor containing string
+//string in port; DS must point to segment descriptor containing string
 static inline void outsb(uint16_t port, char *s)
 {
 	size_t n = strlen(s);

@@ -15,7 +15,8 @@ PERL	= perl
 # TODO: What about -nostdinc
 CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
 	  -fno-strict-aliasing -fno-omit-frame-pointer \
-	  -fno-stack-protector -finline-functions -I../include -m32
+	  -fno-stack-protector -finline-functions -I../include -m32 \
+	  -nostdinc
 ASFLAGS	= -Wa,-divide -m32 -I../include
 LDFLAGS = -m elf_i386 -r
 

@@ -11,7 +11,8 @@ LD	= ld
 
 CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
 	  -fno-strict-aliasing -fno-omit-frame-pointer \
-	  -fno-stack-protector -finline-functions -I../include -m32
+	  -fno-stack-protector -finline-functions -I../include -m32 \
+	  -nostdinc
 LDFLAGS = -m elf_i386 -r
 
 all:	$(OBJS)
