@@ -30,12 +30,15 @@
 #include <x86os/block/blk-dev.h>
 #include <x86os/mm/mm.h>
 #include <x86os/list.h>
+#include <x86os/wait_queue.h>
 
 // TODO: Add initialization
 static struct {
 	struct spinlock lock;
 	struct list_head head;
 } bcache;
+
+static DECLARE_WAIT_QUEUE_HEAD(bwait);
 
 void
 binit()
@@ -90,7 +93,7 @@ bget(dev_t dev, sector_t sector)
 					return p;
 				}
 				// Buf is busy, wait for brelease
-				sleep(p, &bcache.lock);
+				wait(&bwait, &bcache.lock);
 				continue;	// search for buffer again
 			}
 		}
@@ -98,7 +101,7 @@ bget(dev_t dev, sector_t sector)
 		break;
 	}
 
-	// Noncached
+	// Noncached. Find non-busy and non-dirty block
 	list_for_each_entry(p, &bcache.head, bufs) {
 		if (!(p->flags & B_BUSY) && !(p->flags & B_DIRTY)) {
 			p->dev = dev;
@@ -122,7 +125,7 @@ bread(dev_t dev, sector_t sector)
 
 	p = bget(dev, sector);
 	if (!(p->flags & B_VALID))
-		// TODO: ioscheduler
+		// TODO: ioscheduler?
 		do_blkread(p);
 
 	return p;
@@ -151,6 +154,6 @@ brelease(struct buf *buf)
 
 	spin_lock(&bcache.lock);
 	buf->flags &= ~B_BUSY;
-	wakeup(buf);
+	wakeup(&bwait);
 	spin_unlock(&bcache.lock);
 }

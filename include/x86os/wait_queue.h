@@ -23,11 +23,11 @@ struct __wait_queue {
 typedef struct __wait_queue_head wait_queue_head_t;
 
 #define __WAIT_QUEUE_HEAD_INITIALIZER(name) {		\
-	.lock = __SPIN_LOCK_INIT_UNLOCKED,			\
-	.task_list = LIST_HEAD_INIT((name).lock), }
+	.lock = __SPIN_LOCK_INIT_UNLOCKED(name),	\
+	.task_list = LIST_HEAD_INIT((name).task_list), }
 
 #define DECLARE_WAIT_QUEUE_HEAD(name) \
-	struct wait_queue name = __WAIT_QUEUE_HEAD_INITIALIZER(name)
+	wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)
 
 void init_waitqueue_head(wait_queue_head_t *q);
 void wait(wait_queue_head_t *q, struct spinlock *lock);
