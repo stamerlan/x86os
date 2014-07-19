@@ -40,7 +40,6 @@ struct task_struct
 	int pid;			// process ID
 	struct trapframe *tf;		// trap frame for current syscall
 	struct context *context;	// swtch() here to run process
-	void *chan;			// if nonzero, sleeping on chan
 	int errno;
 	uid_t uid;
 	struct task_struct *parent;	// parent process
@@ -95,8 +94,7 @@ struct tss_struct
 void userinit();
 void scheduler();
 void yield();
-void sleep(void *chan, struct spinlock *lock);
-void wakeup(void *chan);
+void sched();
 
 extern struct task_struct *current;
 

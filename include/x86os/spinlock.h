@@ -16,5 +16,8 @@ void spin_lock_init(struct spinlock *lock);
 void spin_lock(struct spinlock *lock);
 void spin_unlock(struct spinlock *lock);
 
+#define __SPIN_LOCK_INIT_UNLOCKED(name)	{ 0 }
+#define __SPIN_LOCK_INIT_LOCKED(name)	{ 1 }
+
 #endif /* SPINLOCK_H */
 

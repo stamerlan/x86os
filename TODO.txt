@@ -4,3 +4,5 @@
 4. ext2 driver
 5. Make vfs code more common
 6. Disk driver
+7. Remove SMP embryo-support (spinlocks)
+8. RAM disk driver

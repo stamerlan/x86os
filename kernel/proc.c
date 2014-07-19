@@ -82,7 +82,7 @@ allocproc()
 /* Enter scheduler.
  * NOTE: ptable.lock must be held and current->state already changed.
  */
-static void
+void
 sched()
 {
 	// TODO: add check is ptable.lock is holding.
@@ -181,36 +181,3 @@ yield()
 	spin_unlock(&ptable.lock);
 }
 
-/* Atomically release lock and sleep on chan.
- * Reacquires lock when awakened.
- */
-void
-sleep(void *chan, struct spinlock *lock)
-{
-	spin_lock(&ptable.lock);
-	spin_unlock(lock);
-
-	current->chan = chan;
-	current->state = TASK_SLEEPING;
-
-	sched();
-
-	// Waking up
-	current->chan = NULL;
-	spin_lock(lock);
-	spin_unlock(&ptable.lock);
-}
-
-// Wake up all processes sleeping on chan.
-void
-wakeup(void *chan)
-{
-	struct task_struct *p;
-
-	spin_lock(&ptable.lock);
-	list_for_each_entry(p, &ptable.proc, tasks) {
-		if (p->state == TASK_SLEEPING && p->chan == chan)
-			p->state = TASK_RUNNABLE;
-	}
-	spin_unlock(&ptable.lock);
-}
