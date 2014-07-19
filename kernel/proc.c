@@ -82,7 +82,7 @@ allocproc()
 /* Enter scheduler.
  * NOTE: ptable.lock must be held and current->state already changed.
  */
-void
+static void
 sched()
 {
 	// TODO: add check is ptable.lock is holding.
@@ -171,12 +171,14 @@ userinit()
 	p->state = TASK_RUNNABLE;
 }
 
-// Schedule next process.
+/* Schedule next process.
+ * @task_state: current process new state
+ */
 void
-yield()
+yield(int task_state)
 {
 	spin_lock(&ptable.lock);
-	current->state = TASK_RUNNABLE;
+	current->state = task_state;
 	sched();
 	spin_unlock(&ptable.lock);
 }

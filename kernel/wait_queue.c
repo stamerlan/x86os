@@ -4,6 +4,7 @@
  */
 
 #include <x86os/wait_queue.h>
+#include <x86os/types.h>
 #include <x86os/proc.h>
 #include <x86os/spinlock.h>
 #include <x86os/mm/mm.h>
@@ -19,13 +20,12 @@ void wait(wait_queue_head_t *q, struct spinlock *lock)
 
 
 	spin_lock(&q->lock);
-	current->state = TASK_SLEEPING;
 	list_add_tail(&q->task_list, &w->task_list);
 	w->task = current;
 	spin_unlock(lock);
 	spin_unlock(&q->lock);
 
-	sched();
+	yield(TASK_SLEEPING);
 
 	spin_lock(lock);
 }

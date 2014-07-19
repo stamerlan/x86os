@@ -93,8 +93,7 @@ struct tss_struct
 
 void userinit();
 void scheduler();
-void yield();
-void sched();
+void yield(int task_state);
 
 extern struct task_struct *current;
 

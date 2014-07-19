@@ -31,7 +31,7 @@ trap(struct trapframe *tf)
 {
 	switch (tf->trapno) {
 	case T_IRQ0 + IRQ_TIMER:
-		yield();
+		yield(TASK_RUNNING);
 		break;
 	case T_SYSCALL:
 		outb(0xe9, 'A');
