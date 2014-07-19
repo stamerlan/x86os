@@ -9,8 +9,8 @@
 #include <x86os/x86.h>
 #include <x86os/mm/seg.h>
 #include <x86os/mm/page.h>
-
 #include <x86os/mm/mm.h>
+#include <multiboot.h>
 
 static struct segdesc gdt[NR_SEGS];
 static struct tss_struct ts;
@@ -20,8 +20,10 @@ static char *free = (char *) 0x200000;
 const char *max_mem = (char *) 0x2000000;	// 32 MB
 
 void
-mm_init()
+mm_init(size_t modules_count, multiboot_module_t* modules)
 {
+	size_t i;
+
 	// Setup segments
 	gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_SYS);
 	gdt[SEG_KDATA] = SEG(STA_W, 0, 0xFFFFFFFF, DPL_SYS);
@@ -44,16 +46,11 @@ mm_init()
 	cr0 |= CR0_PG;
 	wcr0(cr0);
 
-	/*
-	   // TODO: REMOVE ME. A test: map 0x1ff000 to 0xb8000
-	   kmap(kpde, (void*)0xb8000, (void*)0x1ff000);
-
-	   char* text = (char*)(0x1ff000 + 80 * 2 * 1);
-	   static char text_to_show[] = "kmap() works fine!";
-	   size_t i;
-	   for(i = 0; i < sizeof(text_to_show); i++, text += 2)
-	   *text = text_to_show[i];
-	 */
+	for (i = 0; i < modules_count; i++, modules++) {
+		// NOTE: mark memory as allocated to module
+		if (free < (char*)modules->mod_end)
+			free = (char *)modules->mod_end;
+	}
 }
 
 void *

@@ -38,8 +38,12 @@ static struct block_device_operations ops = {
 	.write = write,
 };
 
+/* Initialize RAM disk driver
+ * @start - start of ramdisk region
+ * @end - end of ramdisk region (points to next byte after disk end)
+ */
 void
-init_ramdrv()
+init_ramdrv(char *start, char *end)
 {
 	disk_data = kmalloc(DISK_SIZE);
 	if (!disk_data)

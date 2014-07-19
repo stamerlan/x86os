@@ -64,7 +64,7 @@ allocproc()
 	// Return from forkret to trapret
 	sp -= 4;
 	*(uint32_t *) sp = (uint32_t) trapret;
-	log_printf("debug: allocproc(): ret addr ptr = 0x%x, ret add = %x\n",
+	log_printf("debug: allocproc(): ret addr ptr = 0x%x, ret addr = 0x%x\n",
 		   sp, *(uint32_t *) sp);
 
 	sp -= sizeof (struct context);

@@ -54,6 +54,9 @@ register_blkdev(struct block_device_operations * ops)
 	list_add(&p->bdevs, &blkdev_table.head);
 	spin_unlock(&blkdev_table.lock);
 
+	log_printf("block: registred blkdev %d. block_device_operations at " \
+			"0x%x\n", p->dev, ops);
+
 	return p->dev;
 }
 
@@ -73,6 +76,8 @@ unregister_blkdev(dev_t dev)
 	}
 out:
 	spin_unlock(&blkdev_table.lock);
+
+	log_printf("block: unregistred blkdev %d\n");
 }
 
 /* If B_VALID isn't set, invoke read function, set B_VALID
@@ -91,7 +96,6 @@ do_blkread(struct buf *b)
 
 	struct block_device *p = NULL;
 	spin_lock(&blkdev_table.lock);
-	//for (p = blkdev_table.head; p != NULL; p = p->next) {
 	list_for_each_entry(p, &blkdev_table.head, bdevs) {
 		if (p->dev == b->dev)
 			break;

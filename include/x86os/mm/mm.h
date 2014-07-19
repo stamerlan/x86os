@@ -8,8 +8,9 @@
 #include <x86os/types.h>
 #include <x86os/proc.h>
 #include <x86os/mm/page.h>
+#include <multiboot.h>
 
-void mm_init();
+void mm_init(size_t modules_count, multiboot_module_t* modules);
 void *kmalloc(size_t sz);
 void *kpagealloc(size_t pages);
 struct pde *setupvm();
