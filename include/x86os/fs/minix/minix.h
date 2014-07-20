@@ -1,5 +1,7 @@
 /* File: minix.h
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
+ *
+ * Minix filesystem v1 constants and structures
  */
 
 #ifndef MINIX_FS_H
@@ -7,21 +9,47 @@
 
 #include <x86os/types.h>
 
-#define BLOCK_SIZE	1024
+#define MINIX_ROOT_INO	1
 
+#define BLOCK_SIZE	1024
+#define MINIX_INODES_PER_BLOCK ((BLOCK_SIZE)/(sizeof(struct minix_inode)))
+
+#define MINIX_SUPER_MAGIC2	0x138F		/* minix v1 fs, 30 char names */
+
+/*
+ * This is the original minix inode layout on disk.
+ * Note the 8-bit gid and atime and ctime.
+ */
+struct minix_inode {
+	uint16_t i_mode;
+	uint16_t i_uid;
+	uint32_t i_size;
+	uint32_t i_time;
+	uint8_t  i_gid;
+	uint8_t  i_nlinks;
+	uint16_t i_zone[9];
+} __attribute__((packed));
+
+/*
+ * minix super-block data on disk
+ */
 struct minix_super_block {
-	uint16_t	s_ninodes;	/* Number of inodes */
-	uint16_t	s_nzones;	/* Number of data zones */
-	uint16_t	s_imap_blocks;	/* Space used by inode map (blocks) */
-	uint16_t	s_zmap_blocks;	/* Space used by zone map (blocks) */
-	uint16_t	s_firstdatazone;/* First zpne with "file" data */
-	uint16_t	s_log_zone_size;/* Size of data zone =
-					    (1024 << s_log_zone_size) */
-	uint32_t	s_max_size;	/* Maximum file size (bytes) */
-	uint16_t	s_magic;	/* Minix 14/30 ID number */
-	uint16_t	s_state;	/* Mount state, was it 
-					    cleanly unmounted */
-};
+	uint16_t s_ninodes;
+	uint16_t s_nzones;
+	uint16_t s_imap_blocks;
+	uint16_t s_zmap_blocks;
+	uint16_t s_firstdatazone;
+	uint16_t s_log_zone_size;
+	uint32_t s_max_size;
+	uint16_t s_magic;
+	uint16_t s_state;
+	uint32_t s_zones;
+} __attribute__((packed));
+
+struct minix_dir_entry {
+	uint16_t inode;
+	char name[0];
+} __attribute__((packed));
 
 #endif /* MINIX_FS_H */
 

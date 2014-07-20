@@ -95,6 +95,14 @@ cp -v $2 $MOUNTPOINT/boot/kernel
 # NOTE: CREATING INITRD
 dd if=/dev/zero of=$DIRNAME/initrd bs=1k count=20
 mkfs.minix $DIRNAME/initrd
+mkdir tmp/
+losetup /dev/loop1 $DIRNAME/initrd
+mount /dev/loop1 tmp/
+cp -Rv $DIRNAME/initrd.dir/* tmp/
+sync
+umount tmp/
+losetup -d /dev/loop1
+rm -fr tmp/
 cp -v $DIRNAME/initrd $MOUNTPOINT/boot/initrd
 
 umount /dev/loop0

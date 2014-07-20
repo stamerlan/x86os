@@ -21,7 +21,7 @@ read(struct buf *buf)
 	if (buf->sector > disk_sectors)
 		return -EFAULT;
 
-	memmove(buf->data, disk_data + (buf->sector - 1) * 512, 512);
+	memmove(buf->data, disk_data + buf->sector * 512, 512);
 
 	return 0;
 }
@@ -47,7 +47,7 @@ init_ramdrv(char *start, char *end)
 	disk_data = start;
 	disk_sectors = (end - start) / 512;
 
-	log_printf("ramdrv: init: start = 0x%x, end = 0x%x. Data: \n",
+	log_printf("ramdrv: init: start = 0x%x, end = 0x%x\n",
 		       start, end);
 
 	disk_dev = register_blkdev(&ops);

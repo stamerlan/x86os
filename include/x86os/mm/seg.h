@@ -16,16 +16,14 @@
 #define SEG_TSS		5
 
 // Segment descriptor
-struct segdesc
-{
+struct segdesc {
 	uint32_t lim_15_0 : 16;		// low bits of seg limit
 	uint32_t base_15_0 : 16;	// low bits of seg base addr
 	uint32_t base_23_16 : 8;	// middle bits of seg base addr
 	/* Segment type bits
 	 * TODO: use define instead
 	 */
-	enum seg_type
-	{
+	enum seg_type {
 		STA_X	= 0x8,		// app executable
 		STA_E	= 0x4,		// app expand down (non-exec seg)
 		STA_C	= 0x4,		// app conforming code seg (exec seg)
