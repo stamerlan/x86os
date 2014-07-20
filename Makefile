@@ -54,7 +54,7 @@ ctags:
 
 clean:
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
-	rm -f $(KERNELFILE)
+	rm -f $(KERNELFILE) tools/initrd
 
 distclean:	clean
 	rm -f $(IMG) System.map tags

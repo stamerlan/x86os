@@ -12,10 +12,10 @@
 
 #define NR_FILESYSTEMS	1
 
-extern struct file_system_type testfs;
+extern struct file_system_type minixfs;
 
 struct fs_node *root;
-static struct file_system_type *filesystems[NR_FILESYSTEMS] = { &testfs };
+static struct file_system_type *filesystems[NR_FILESYSTEMS] = { &minixfs };
 
 void
 mount_root(dev_t root_dev)

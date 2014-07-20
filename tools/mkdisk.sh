@@ -91,6 +91,10 @@ if [ $create_new_img ]; then
 fi
 
 cp -v $2 $MOUNTPOINT/boot/kernel
+
+# NOTE: CREATING INITRD
+dd if=/dev/zero of=$DIRNAME/initrd bs=1k count=20
+mkfs.minix $DIRNAME/initrd
 cp -v $DIRNAME/initrd $MOUNTPOINT/boot/initrd
 
 umount /dev/loop0

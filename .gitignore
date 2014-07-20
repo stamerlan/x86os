@@ -5,4 +5,5 @@
 /kernel/vectors.S
 /System.map
 /tools/kernel
+/tools/initrd
 /x86os.img
