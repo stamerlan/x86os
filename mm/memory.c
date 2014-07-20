@@ -23,6 +23,12 @@ void
 mm_init(size_t modules_count, multiboot_module_t* modules)
 {
 	size_t i;
+	for (i = 0; i < modules_count; i++, modules++) {
+		// NOTE: mark memory as allocated to module
+		if (free < (char*)modules->mod_end)
+			free = (char *)modules->mod_end;
+	}
+	log_printf("debug: mm_init: free = 0x%x\n", free);
 
 	// Setup segments
 	gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_SYS);
@@ -45,12 +51,6 @@ mm_init(size_t modules_count, multiboot_module_t* modules)
 	uint32_t cr0 = rcr0();
 	cr0 |= CR0_PG;
 	wcr0(cr0);
-
-	for (i = 0; i < modules_count; i++, modules++) {
-		// NOTE: mark memory as allocated to module
-		if (free < (char*)modules->mod_end)
-			free = (char *)modules->mod_end;
-	}
 }
 
 void *

@@ -12,6 +12,8 @@
 #include <x86os/block/bio.h>
 #include <x86os/fs/fs.h>
 
+#include <x86os/block/buf.h>
+
 void init_testfs();
 void init_ramdrv(char *, char *);
 
@@ -32,7 +34,9 @@ kmain(long magic, multiboot_info_t *mbi)
 		}
 	}
 	else {
-		mm_init(0, NULL);
+		// PANIC!!!
+		log_printf("panic: there is no ramdisk\n");
+		for(;;);
 	}
 
 	pic_init();
@@ -43,9 +47,13 @@ kmain(long magic, multiboot_info_t *mbi)
 	pic_enable(IRQ_TIMER);
 	binit();
 
-	init_ramdrv(NULL, NULL);
+	init_ramdrv((char*)((multiboot_module_t*)(mbi->mods_addr))->mod_start, 
+		(char*)((multiboot_module_t*)(mbi->mods_addr))->mod_end);
+
+	struct buf *b = bread(1, 0);
+	log_printf("main: read from ramdisk: %s", &b->data);
 
 	//scheduler();
 
-	for (;;) ;
+	for(;;);
 }

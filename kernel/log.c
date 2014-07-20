@@ -80,6 +80,7 @@ log_printf(char *fmt, ...)
 			case 'c':	// Symbol
 				s = "?";
 				s[0] = va_arg(argp, int);
+				break;
 			default:	// Unknown
 				s = "%?";
 				s[1] = c;

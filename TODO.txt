@@ -6,3 +6,5 @@
 6. Disk driver
 7. Remove SMP embryo-support (spinlocks)
 8. RAM disk driver
+9. Use multiboot 2
+10. Add 'make distclean' to menu

@@ -15,6 +15,10 @@
 DISK_SZ=10080
 MOUNTPOINT=/mnt
 
+FILENAME=`readlink -e "$0"`
+DIRNAME=`dirname "$FILENAME"`
+
+
 # Creates parition table
 #  - arg1 - DiskImage file
 create_parttab ()
@@ -40,6 +44,7 @@ set default=0
 
 menuentry "x86os" {
 	multiboot /boot/kernel
+	module /boot/initrd
 	boot
 }
 EOF
@@ -85,7 +90,8 @@ if [ $create_new_img ]; then
 	losetup -d /dev/loop1
 fi
 
-cp $2 $MOUNTPOINT/boot/kernel
+cp -v $2 $MOUNTPOINT/boot/kernel
+cp -v $DIRNAME/initrd $MOUNTPOINT/boot/initrd
 
 umount /dev/loop0
 losetup -d /dev/loop0
