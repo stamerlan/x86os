@@ -3,12 +3,12 @@
  *
  * Buffer cache
  *
- * The buffer cache is a linked list of buf structures holding cached copies
+ * The buffer cache is a linked list of buffer structures holding cached copies
  * of disk block contents. Caching disk blocks in memory reduces the number of
  * disk reads.
  *
  * Interface:
- *  - To get a buffer for a particaular disk block, call bread
+ *  - To get a buffer for a particaular filesystem block call bread
  *  - After changing buffer data, call bwrite to write it to disk
  *  - Don't use the buffer after calling brelease
  *  - Only one process at a time can use a buffer, so don't keep them longer
@@ -26,8 +26,8 @@
 #include <x86os/types.h>
 #include <x86os/log.h>
 #include <x86os/proc.h>
-#include <x86os/block/buf.h>
-#include <x86os/block/blk-dev.h>
+#include <x86os/block/buffer.h>
+#include <x86os/block/blkdev.h>
 #include <x86os/mm/mm.h>
 #include <x86os/list.h>
 #include <x86os/wait_queue.h>
@@ -44,55 +44,53 @@ void
 binit()
 {
 	size_t i;
-	struct buf *p;
+	struct buffer *p;
 
 	INIT_LIST_HEAD(&bcache.head);
 
 	// TODO: Flag MEM_FS
-	p = kmalloc(sizeof (struct buf));
+	p = kmalloc(sizeof(struct buffer));
 	if (!p) {
 		// PANIC
 		log_printf("panic: binit\n");
 		return;
 	}
-	p->dev = 0;
-	p->flags = 0;
-	list_add(&p->bufs, &bcache.head);
 
 	for (i = 0; i < NR_BUF; i++) {
 		// TODO: Flag MEM_FS
-		p = kmalloc(sizeof (struct buf));
+		p = kmalloc(sizeof(struct buffer));
 		if (!p) {
 			// PANIC
 			log_printf("panic: binit\n");
 			return;
 		}
-		p->dev = 0;
-		p->flags = 0;
-		list_add(&p->bufs, &bcache.head);
+		p->b_dev = 0;
+		p->b_flags = 0;
+		list_add(&p->b_bufs, &bcache.head);
 	}
 }
 
 /* Look throught bcache for sector on dev. If not found, allocate new block. 
  * In any case, return B_BUSY buffer
  */
-static struct buf *
-bget(dev_t dev, sector_t sector)
+static struct buffer *
+bget(dev_t dev, sector_t blocknr)
 {
-	struct buf *p;
+	struct buffer *p;
 
 	spin_lock(&bcache.lock);
 
 	for(;;) {
-		// Is the sector already cached?
-		list_for_each_entry(p, &bcache.head, bufs) {
-			if (p->dev == dev && p->sector == sector) {
-				if (!(p->flags & B_BUSY)) {
-					p->flags |= B_BUSY;
+		// Is the buffer already cached?
+		list_for_each_entry(p, &bcache.head, b_bufs) {
+			if (p->b_dev == dev && p->b_blocknr == blocknr) {
+				if (!(p->b_flags & B_BUSY)) {
+					p->b_flags |= B_BUSY;
 					spin_unlock(&bcache.lock);
 					return p;
 				}
 				// Buf is busy, wait for brelease
+				// TODO: wait only for necessary block
 				wait(&bwait, &bcache.lock);
 				continue;	// search for buffer again
 			}
@@ -102,11 +100,11 @@ bget(dev_t dev, sector_t sector)
 	}
 
 	// Noncached. Find non-busy and non-dirty block
-	list_for_each_entry(p, &bcache.head, bufs) {
-		if (!(p->flags & B_BUSY) && !(p->flags & B_DIRTY)) {
-			p->dev = dev;
-			p->sector = sector;
-			p->flags = B_BUSY;
+	list_for_each_entry(p, &bcache.head, b_bufs) {
+		if (!(p->b_flags & B_BUSY) && !(p->b_flags & B_DIRTY)) {
+			p->b_dev = dev;
+			p->b_blocknr = blocknr;
+			p->b_flags = B_BUSY;
 			spin_unlock(&bcache.lock);
 			return p;
 		}
@@ -117,14 +115,12 @@ bget(dev_t dev, sector_t sector)
 	return NULL;
 }
 
-// Return a B_BUSY buf with the contents of the indicated disk sector
-struct buf *
-bread(dev_t dev, sector_t sector)
+// Return a B_BUSY bufffer with the contents of the indicated disk block
+struct buffer *
+bread(dev_t dev, sector_t blocknr)
 {
-	struct buf *p;
-
-	p = bget(dev, sector);
-	if (!(p->flags & B_VALID))
+	struct buffer *p = bget(dev, blocknr);
+	if (!(p->b_flags & B_VALID))
 		// TODO: ioscheduler?
 		do_blkread(p);
 
@@ -133,27 +129,27 @@ bread(dev_t dev, sector_t sector)
 
 // Writes buf contents to disk. Must be B_BUSY
 void
-bwrite(struct buf *buf)
+bwrite(struct buffer *buf)
 {
-	if (!(buf->flags & B_BUSY))
+	if (!(buf->b_flags & B_BUSY))
 		// PANIC
 		log_printf("panic: bwrite non-busy buf\n");
 
-	buf->flags |= B_DIRTY;
+	buf->b_flags |= B_DIRTY;
 	// TODO: ioscheduler
 	do_blkwrite(buf);
 }
 
 // Release a B_BUSY buffer
 void
-brelease(struct buf *buf)
+brelease(struct buffer *buf)
 {
-	if (!(buf->flags & B_BUSY))
+	if (!(buf->b_flags & B_BUSY))
 		// PANIC
 		log_printf("panic: brelease\n");
 
 	spin_lock(&bcache.lock);
-	buf->flags &= ~B_BUSY;
+	buf->b_flags &= ~B_BUSY;
 	wakeup(&bwait);
 	spin_unlock(&bcache.lock);
 }

@@ -22,15 +22,15 @@ static sector_t inode_table;
 
 static void print_inode(dev_t dev, unsigned int i_no)
 {
-	struct buf *buf;
+	struct buffer *buf;
 	sector_t i_block = i_no / MINIX_INODES_PER_BLOCK;
-	struct buf *b = bread(dev, inode_table + i_block * 2);
+	struct buffer *b = bread(dev, inode_table + i_block * 2);
 	log_printf("sector: %d ", inode_table + i_block * 2);
 	if (!b) {
 		log_printf("can't read inode\n");
 		return;
 	}
-	struct minix_inode *inode = &((struct minix_inode *)&b->data)
+	struct minix_inode *inode = &((struct minix_inode *)&b->b_data)
 		[i_no % (512 / sizeof(struct minix_inode))];
 	log_printf("i_size = %d i_mode = 0x%x\n", inode->i_size, inode->i_mode);
 	if (S_ISDIR(inode->i_mode)) {
@@ -42,11 +42,11 @@ static void print_inode(dev_t dev, unsigned int i_no)
 		} else {
 			size_t i;
 			struct minix_dir_entry *dir = 
-				(struct minix_dir_entry*)&buf->data;
+				(struct minix_dir_entry*)&buf->b_data;
 			for (i = 0; i < 512 / 32; 
 				i++, dir = (struct minix_dir_entry*)((char*)dir + 32)) {
 				log_printf("   %d (0x%x): inode = %d, name = %s\n",
-					i, (char*)dir - buf->data, dir->inode, dir->name);
+					i, (char*)dir - buf->b_data, dir->inode, dir->name);
 			}
 			brelease(buf);
 		}
@@ -58,7 +58,7 @@ static void print_inode(dev_t dev, unsigned int i_no)
 			log_printf("   failed to read %d zone at " \
 				"%d sector\n", 0, inode->i_zone[0] * 2);
 		} else {
-			log_printf("   %s\n", buf->data);
+			log_printf("   %s\n", buf->b_data);
 			brelease(buf);
 		}
 
@@ -71,7 +71,7 @@ static struct fs_node *
 get_root(dev_t dev)
 {
 	size_t i;
-	struct buf *b, *sb_buf;
+	struct buffer *b, *sb_buf;
 	struct minix_super_block *sb;
 
 	// Read sb
@@ -83,7 +83,7 @@ get_root(dev_t dev)
 		return NULL;
 	}
 
-	sb = (struct minix_super_block *)&sb_buf->data;
+	sb = (struct minix_super_block *)&sb_buf->b_data;
 	log_printf("minixfs: super_block:\n"	\
 		" s_ninodes:\t\t%d\n"		\
 		" s_nzones:\t\t%d\n"		\
@@ -126,7 +126,7 @@ get_root(dev_t dev)
 			// kfree imap
 			return NULL;
 		}
-		memmove(imap + i * 512, b->data, 512);
+		memmove(imap + i * 512, b->b_data, 512);
 		brelease(b);
 	}
 	for (i = 0; i < sb->s_zmap_blocks * 2; i++) {
@@ -139,7 +139,7 @@ get_root(dev_t dev)
 			// kfree imap
 			return NULL;
 		}
-		memmove(zmap + i * 512, b->data, 512);
+		memmove(zmap + i * 512, b->b_data, 512);
 		brelease(b);
 	}
 	inode_table = 4 + sb->s_imap_blocks * 2 + sb->s_zmap_blocks * 2;
@@ -157,7 +157,6 @@ get_root(dev_t dev)
 
 	return NULL;
 }
-
 
 struct file_system_type minixfs = {
 	.name = "minixfs",

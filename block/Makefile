@@ -6,7 +6,7 @@ ARCHIVES = ram/ram.o
 
 OUT	= block.o
 
-OBJS	= bio.o blk-dev.o
+OBJS	= bio.o blkdev.o
 
 CC	= gcc
 AS	= gas

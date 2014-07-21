@@ -6,12 +6,14 @@
 #define BIO_H
 
 #include <x86os/types.h>
-#include <x86os/block/buf.h>
+#include <x86os/block/buffer.h>
+
+#define SECTOR_SIZE	512
 
 void binit();
-struct buf *bread(dev_t dev, sector_t sector);
-void bwrite(struct buf *buf);
-void brelease(struct buf *buf);
+struct buffer *bread(dev_t dev, sector_t blocknr);
+void bwrite(struct buffer *buf);
+void brelease(struct buffer *buf);
 
 #endif /* BIO_H */
 

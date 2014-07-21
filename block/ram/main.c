@@ -9,25 +9,25 @@
 #include <x86os/string.h>
 #include <x86os/errno.h>
 #include <x86os/mm/mm.h>
-#include <x86os/block/blk-dev.h>
+#include <x86os/block/blkdev.h>
 
 static dev_t disk_dev;
 static char *disk_data;
 static sector_t disk_sectors;
 
 static int
-read(struct buf *buf)
+read(struct buffer *buf)
 {
-	if (buf->sector > disk_sectors)
+	if (buf->b_blocknr > disk_sectors)
 		return -EFAULT;
 
-	memmove(buf->data, disk_data + buf->sector * 512, 512);
+	memmove(buf->b_data, disk_data + buf->b_blocknr * 512, 512);
 
 	return 0;
 }
 
 static int
-write(struct buf *buf)
+write(struct buffer *buf)
 {
 	return -EFAULT;
 }

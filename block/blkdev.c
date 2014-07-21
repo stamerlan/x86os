@@ -1,4 +1,4 @@
-/* File: blk-dev.c
+/* File: blkdev.c
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
@@ -6,8 +6,8 @@
 #include <x86os/spinlock.h>
 #include <x86os/log.h>
 #include <x86os/mm/mm.h>
-#include <x86os/block/blk-dev.h>
-#include <x86os/block/buf.h>
+#include <x86os/block/blkdev.h>
+#include <x86os/block/buffer.h>
 #include <x86os/list.h>
 
 // TODO: add device name
@@ -84,12 +84,12 @@ out:
  * NOTE: Buffer must be busy
  */
 void
-do_blkread(struct buf *b)
+do_blkread(struct buffer *b)
 {
-	if (!(b->flags & B_BUSY))
+	if (!(b->b_flags & B_BUSY))
 		// PANIC
 		log_printf("panic: do_blkread: buf isn't busy\n");
-	if (b->flags & B_VALID) {
+	if (b->b_flags & B_VALID) {
 		log_printf("debug: do_blkread: nothing to do\n");
 		return;
 	}
@@ -97,28 +97,28 @@ do_blkread(struct buf *b)
 	struct block_device *p = NULL;
 	spin_lock(&blkdev_table.lock);
 	list_for_each_entry(p, &blkdev_table.head, bdevs) {
-		if (p->dev == b->dev)
+		if (p->dev == b->b_dev)
 			break;
 	}
 	spin_unlock(&blkdev_table.lock);
 	if (&p->bdevs == &blkdev_table.head)
 		// Device wasn't found
 		return;
-	// TODO: IMPORTANT!!! do request before device unregistred 
+	// TODO: IMPORTANT!!! do request before device may be unregistred 
 	if (!p->ops->read(b))
-		b->flags |= B_VALID;
+		b->b_flags |= B_VALID;
 }
 
 /* If B_DIRTY is set, invoke write function, set B_VALID and reset B_DIRTY
  * NOTE: Buffer must be busy
  */
 void
-do_blkwrite(struct buf *b)
+do_blkwrite(struct buffer *b)
 {
-	if (!(b->flags & B_BUSY))
+	if (!(b->b_flags & B_BUSY))
 		// PANIC
 		log_printf("panic: do_blkwrite: buf isn't busy\n");
-	if (!(b->flags & B_DIRTY)) {
+	if (!(b->b_flags & B_DIRTY)) {
 		log_printf("debug: do_blkwrite: nothing to do\n");
 		return;
 	}
@@ -127,7 +127,7 @@ do_blkwrite(struct buf *b)
 	spin_lock(&blkdev_table.lock);
 	//for (p = blkdev_table.head; p != NULL; p = p->next) {
 	list_for_each_entry(p, &blkdev_table.head, bdevs) {
-		if (p->dev == b->dev)
+		if (p->dev == b->b_dev)
 			break;
 	}
 	spin_unlock(&blkdev_table.lock);
@@ -136,7 +136,7 @@ do_blkwrite(struct buf *b)
 		return;
 	// TODO: IMPORTANT!!! do request before device unregistred 
 	if (!p->ops->write(b)) {
-		b->flags &= ~B_DIRTY;
-		b->flags |= B_VALID;
+		b->b_flags &= ~B_DIRTY;
+		b->b_flags |= B_VALID;
 	}
 }
