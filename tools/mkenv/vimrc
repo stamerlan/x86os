@@ -60,17 +60,20 @@ map <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 
 " Сохранение по F2
-imap <F2> <Esc>:w<CR>
-map <F2> <Esc>:w<CR>
+inoremap <F2> <Esc>:w<CR>
+noremap <F2> <Esc>:w<CR>
 " F4 - новая вкладка
-imap <F4> <Esc>:tabnew<CR>
-map <F4> <Esc>:tabnew<CR>
+inoremap <F4> <Esc>:tabnew<CR>
+noremap <F4> <Esc>:tabnew<CR>
 " F5 - переключение вкладок справа-налево
-imap <F5> <Esc>:tabprev<CR>i
-map <F5> :tabprev<CR>
+inoremap <F5> <Esc>:tabprev<CR>i
+noremap <F5> :tabprev<CR>
 " F6 - переключение вкладок слева-направо
-imap <F6> <Esc>:tabnext<CR>i
-map <F6> :tabnext<CR>
+inoremap <F6> <Esc>:tabnext<CR>i
+noremap <F6> :tabnext<CR>
+" F7 - перейти к определению функции
+inoremap <F7> <Esc> g]
+noremap <F7> g]
 " F8 - открыть файл под курсором
 inoremap <F8> <Esc> gf
 noremap <F8> gf
