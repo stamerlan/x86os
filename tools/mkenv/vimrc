@@ -111,6 +111,6 @@ inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
 \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
 imap <C-@> <C-Space>
 
-" Подсветка 80 столбца
-set colorcolumn=80
+" Подсветка 81 столбца
+set colorcolumn=81
 hi ColorColumn ctermbg=lightgrey guibg=lightgrey

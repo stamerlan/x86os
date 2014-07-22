@@ -14,12 +14,9 @@
 #include <x86os/mm/mm.h>
 #include <x86os/stat.h>
 
-static char *imap;
-static char *zmap;
-static unsigned int ninodes;
-static unsigned int nzones;
-static sector_t inode_table;
+static struct super_block superblock;
 
+/*
 static void print_inode(dev_t dev, unsigned int i_no)
 {
 	struct buffer *buf;
@@ -66,12 +63,12 @@ static void print_inode(dev_t dev, unsigned int i_no)
 
 	brelease(b);
 }
+*/
 
 static struct fs_node *
 get_root(dev_t dev)
 {
-	size_t i;
-	struct buffer *b, *sb_buf;
+	struct buffer *sb_buf;
 	struct minix_super_block *sb;
 
 	// Read sb
@@ -100,62 +97,20 @@ get_root(dev_t dev)
 		sb->s_magic == MINIX_SUPER_MAGIC2 ? "valid" : "invalid" , 
 		sb->s_state, sb->s_zones);
 
-	ninodes = sb->s_ninodes;
-	nzones = sb->s_zones;
+	memmove(&superblock.s_sb, sb, sizeof(struct minix_super_block));
+	superblock.s_dev = dev;
 
-	// Read imap and zm
-	// ap
-	imap = kmalloc(sb->s_imap_blocks * BLOCK_SIZE);
-	if (!imap) {
-		log_printf("minixfs: failed to allocate imap\n");
+	// Read imap and zmap
+	if (read_imap(&superblock))
+		return NULL;
+	if (read_zmap(&superblock)) {
+		free_imap(&superblock);
 		return NULL;
 	}
-	zmap = kmalloc(sb->s_zmap_blocks * BLOCK_SIZE);
-	if (!zmap) {
-		log_printf("minixfs: failed to allocate zmap\n");
-		// kfree imap
-		return NULL;
-	}
+	brelease(sb_buf);
 
-	for (i = 0; i < sb->s_imap_blocks * 2; i++) {
-		b = bread(dev, 4 + i);
-		log_printf("minixfs: read imap from: %d\n", 4 + i);
-		if (!b) {
-			log_printf("minixfs: failed to read imap\n");
-			// kfree zmap
-			// kfree imap
-			return NULL;
-		}
-		memmove(imap + i * 512, b->b_data, 512);
-		brelease(b);
-	}
-	for (i = 0; i < sb->s_zmap_blocks * 2; i++) {
-		b = bread(dev, 4 + sb->s_imap_blocks * 2 + i);
-		log_printf("minixfs: read zmap from: %d\n", 
-				4 + sb->s_imap_blocks * 2 + i);
-		if (!b) {
-			log_printf("minixfs: failed to read zmap\n");
-			// kfree zmap
-			// kfree imap
-			return NULL;
-		}
-		memmove(zmap + i * 512, b->b_data, 512);
-		brelease(b);
-	}
-	inode_table = 4 + sb->s_imap_blocks * 2 + sb->s_zmap_blocks * 2;
-	log_printf("minixfs: inode_table at %d sector\n", inode_table);
-
-	// DEBUG:
-	for (i = 0; i < ninodes; i++)
-		if (imap[i / 8] & (1 << (i % 8))) {
-			log_printf("minixfs: inode %d allocated: ", i);
-			print_inode(dev, i);
-		}
-	for (i = 0; i < nzones; i++)
-		if (zmap[i / 8] & (1 << (i % 8)))
-			log_printf("minixfs: zone %d allocated\n", i);
-
-	return NULL;
+	struct inode *inode = get_inode(&superblock, MINIX_ROOT_INO);
+	return mk_fs_node(inode);
 }
 
 struct file_system_type minixfs = {

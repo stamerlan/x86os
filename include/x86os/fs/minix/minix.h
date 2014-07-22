@@ -51,5 +51,25 @@ struct minix_dir_entry {
 	char name[0];
 } __attribute__((packed));
 
+/* Memory structrures */
+struct super_block {
+	struct minix_super_block s_sb;
+
+	dev_t	s_dev;
+};
+
+struct inode {
+	struct minix_inode i_inode;
+
+	struct super_block *i_sb;
+};
+
+int read_imap(struct super_block *sb);
+void free_imap(struct super_block *sb);
+struct inode *get_inode(struct super_block *sb, unsigned int ino);
+int read_zmap(struct super_block *sb);
+void free_zmap(struct super_block *sb);
+struct fs_node *mk_fs_node(struct inode *inode);
+
 #endif /* MINIX_FS_H */
 

@@ -2,7 +2,7 @@
 # Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
 #
 SUBDIRS	= minixfs
-ARCHIVES= minixfs/minix.o
+ARCHIVES= minixfs/minixfs.o
 
 OUT	= fs.o
 

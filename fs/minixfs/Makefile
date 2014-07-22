@@ -3,7 +3,7 @@
 
 OUT	= minixfs.o
 
-OBJS	= minix.o
+OBJS	= minix.o inode.o zone.o
 
 CC	= gcc
 AS	= gas

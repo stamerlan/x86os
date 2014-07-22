@@ -13,6 +13,7 @@
 // TODO: add device name
 struct block_device {
 	dev_t dev;
+	unsigned int blocksz;
 	struct block_device_operations *ops;
 	struct list_head bdevs;
 };
@@ -125,7 +126,6 @@ do_blkwrite(struct buffer *b)
 
 	struct block_device *p = NULL;
 	spin_lock(&blkdev_table.lock);
-	//for (p = blkdev_table.head; p != NULL; p = p->next) {
 	list_for_each_entry(p, &blkdev_table.head, bdevs) {
 		if (p->dev == b->b_dev)
 			break;
@@ -140,3 +140,4 @@ do_blkwrite(struct buffer *b)
 		b->b_flags |= B_VALID;
 	}
 }
+
