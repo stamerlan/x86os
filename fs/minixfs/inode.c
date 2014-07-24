@@ -9,6 +9,7 @@
 #include <x86os/block/bio.h>
 #include <x86os/mm/mm.h>
 #include <x86os/fs/minix/minix.h>
+#include <x86os/fs/node.h>
 
 static char *imap;
 static unsigned int ninodes;
@@ -89,7 +90,7 @@ get_inode(struct super_block *sb, unsigned int i_no)
 
 /* void put_inode(struct super_block *, unsigned int); */
 
-struct fs_node *mk_fs_node(struct inode *inode)
+struct fs_node *mk_fs_node(struct inode *inode, struct node_operations *ops)
 {
 	struct fs_node *node = kmalloc(sizeof(struct fs_node));
 	if (!node) {
@@ -100,7 +101,7 @@ struct fs_node *mk_fs_node(struct inode *inode)
 	node->dev = inode->i_sb->s_dev;
 	node->data = (void*)inode;
 	node->mounted = NULL;
-	node->op = NULL;
+	node->op = ops;
 
 	return node;
 	

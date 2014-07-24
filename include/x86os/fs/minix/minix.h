@@ -8,6 +8,7 @@
 #define MINIX_FS_H
 
 #include <x86os/types.h>
+#include <x86os/fs/node.h>
 
 #define MINIX_ROOT_INO	1
 
@@ -69,7 +70,7 @@ void free_imap(struct super_block *sb);
 struct inode *get_inode(struct super_block *sb, unsigned int ino);
 int read_zmap(struct super_block *sb);
 void free_zmap(struct super_block *sb);
-struct fs_node *mk_fs_node(struct inode *inode);
+struct fs_node *mk_fs_node(struct inode *inode, struct node_operations *ops);
 
 #endif /* MINIX_FS_H */
 

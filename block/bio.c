@@ -48,14 +48,6 @@ binit()
 
 	INIT_LIST_HEAD(&bcache.head);
 
-	// TODO: Flag MEM_FS
-	p = kmalloc(sizeof(struct buffer));
-	if (!p) {
-		// PANIC
-		log_printf("panic: binit\n");
-		return;
-	}
-
 	for (i = 0; i < NR_BUF; i++) {
 		// TODO: Flag MEM_FS
 		p = kmalloc(sizeof(struct buffer));
@@ -70,7 +62,7 @@ binit()
 	}
 }
 
-/* Look throught bcache for sector on dev. If not found, allocate new block. 
+/* Look throught bcache for block on dev. If not found, allocate new block. 
  * In any case, return B_BUSY buffer
  */
 static struct buffer *

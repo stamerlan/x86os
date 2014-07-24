@@ -13,7 +13,6 @@
 // TODO: add device name
 struct block_device {
 	dev_t dev;
-	unsigned int blocksz;
 	struct block_device_operations *ops;
 	struct list_head bdevs;
 };

@@ -21,7 +21,8 @@ read(struct buffer *buf)
 	if (buf->b_blocknr > disk_sectors)
 		return -EFAULT;
 
-	memmove(buf->b_data, disk_data + buf->b_blocknr * 512, 512);
+	memmove(buf->b_data, disk_data + buf->b_blocknr * SECTOR_SIZE, 
+		SECTOR_SIZE);
 
 	return 0;
 }
@@ -45,7 +46,7 @@ void
 init_ramdrv(char *start, char *end)
 {
 	disk_data = start;
-	disk_sectors = (end - start) / 512;
+	disk_sectors = (end - start) / SECTOR_SIZE;
 
 	log_printf("ramdrv: init: start = 0x%x, end = 0x%x\n",
 		       start, end);

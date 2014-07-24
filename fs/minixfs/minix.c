@@ -13,8 +13,27 @@
 #include <x86os/block/bio.h>
 #include <x86os/mm/mm.h>
 #include <x86os/stat.h>
+#include <x86os/fs/node.h>
 
 static struct super_block superblock;
+
+/* struct node_operations
+ * Files:
+ *	int (*open)(struct fs_node *node, int flags, mode_t mode);
+ *	ssize_t (*read)(struct fs_node *node, char *buf, size_t count);
+ *	ssize_t (*write)(struct fs_node *node, char *buf, size_t count);
+ *	int (*close)(struct fs_node *node);
+
+ * Directories:
+ *	struct fs_node* (*lookup)(struct fs_node *node, const char *entry);
+ *	int (*create)(struct fs_node *node, const char *entry, 
+ *		struct fs_node *new_node);
+ *	int (*remove)(struct fs_node *node, const char *entry);
+ */
+
+struct node_operations ops = {
+	.read = read,
+};
 
 /*
 static void print_inode(dev_t dev, unsigned int i_no)

@@ -27,7 +27,6 @@ mount_root(dev_t root_dev)
 		if (root) {
 			log_printf("vfs: root fs mounted (%s filesystem)\n",
 				   filesystems[i]->name);
-			log_printf("debug: root = %d\n", (int) root->data);
 			return;
 		}
 	}
