@@ -116,9 +116,8 @@ static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
 }
 
 //string in port; DS must point to segment descriptor containing string
-static inline void outsb(uint16_t port, char *s)
+static inline void outsb(uint16_t port, char *s, size_t n)
 {
-	size_t n = strlen(s);
 	asm volatile("cld\n\t"
 			"rep outsb" :: "S"(s), "d"(port), "c"(n));
 }

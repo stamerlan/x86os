@@ -13,7 +13,7 @@ LD	= ld
 PERL	= perl
 
 # TODO: What about -nostdinc
-CFLAGS	= -Wall -Werror -O -fno-pic -static -fno-builtin \
+CFLAGS	= -Wall -O -fno-pic -static -fno-builtin \
 	  -fno-strict-aliasing -fno-omit-frame-pointer \
 	  -fno-stack-protector -finline-functions -I../include -m32 \
 	  -nostdinc
