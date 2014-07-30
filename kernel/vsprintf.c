@@ -3,7 +3,8 @@
  */
 
 #include <stdarg.h>
-#include <string.h>
+#include <x86os/string.h>
+#include <x86os/vsprintf.h>
 
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 

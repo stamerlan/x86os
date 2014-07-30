@@ -9,6 +9,7 @@
 #include <x86os/types.h>
 #include <x86os/log.h>
 #include <x86os/asm.h>
+#include <x86os/vsprintf.h>
 
 static char buf[1024];
 
@@ -21,16 +22,9 @@ kputc(char c)
 
 // Print string to log
 static void
-kputs(char *s)
+kputs(char *s , size_t len)
 {
-	size_t n = strlen(s);
-	outsb(0xe9, s, n);
-}
-
-static void
-kputs(char *s , int n)
-{
-	outsb(0xe9, s, n);
+	outsb(0xe9, s, len);
 }
 
 /* Format and print string to log
@@ -40,11 +34,11 @@ void
 log_printf(char *fmt, ...)
 {
 	va_list args;
-	int i;
+	int len;
 
 	va_start(args, fmt);
-	i = vsprintf(buf, fmt, args);
+	len = vsprintf(buf, fmt, args);
 	va_end(args);
-	kputs(buf, i);
+	kputs(buf, len);
 
 }

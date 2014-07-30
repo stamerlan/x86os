@@ -5,7 +5,7 @@
 OUT	= kernel.o
 
 OBJS	= startup.o main.o log.o i8259.o vectors.o trap.o trapasm.o string.o \
-	  proc.o x86.o spinlock.o swtch.o
+	  proc.o x86.o spinlock.o swtch.o vsprintf.o
 
 CC	= gcc
 AS	= gas
