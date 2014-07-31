@@ -10,7 +10,7 @@
 #include <x86os/config.h>
 #include <x86os/string.h>
 #include <x86os/x86.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/spinlock.h>
 
 // Process list
@@ -52,23 +52,23 @@ allocproc()
 	p->state = TASK_EMBRYO;
 	p->pid = nextpid++;
 	p->kstack = kpagealloc(KSTACK_SZ / PAGE_SZ);
-	log_printf("debug: allocproc(): kstack = 0x%x\n", p->kstack);
+	printk("debug: allocproc(): kstack = 0x%x\n", p->kstack);
 
 	char *sp = p->kstack + KSTACK_SZ;
 	// Leave place for trap frame
 	sp -= sizeof (struct trapframe);
 	p->tf = (struct trapframe *) sp;
-	log_printf("debug: allocproc(): tf = 0x%x\n", (uint32_t) p->tf);
+	printk("debug: allocproc(): tf = 0x%x\n", (uint32_t) p->tf);
 
 	// Return from forkret to trapret
 	sp -= 4;
 	*(uint32_t *) sp = (uint32_t) trapret;
-	log_printf("debug: allocproc(): ret addr ptr = 0x%x, ret add = %x\n",
-		   sp, *(uint32_t *) sp);
+	printk("debug: allocproc(): ret addr ptr = 0x%x, ret add = %x\n",
+	       sp, *(uint32_t *) sp);
 
 	sp -= sizeof (struct context);
 	p->context = (struct context *) sp;
-	log_printf("debug: allocproc(): context = 0x%x\n", p->context);
+	printk("debug: allocproc(): context = 0x%x\n", p->context);
 	p->context->eip = (uint32_t) forkret;
 
 	acquire(&ptable.lock);
@@ -131,7 +131,7 @@ userinit()
 
 	struct task_struct *p = allocproc();
 	p->pgdir = setupvm();
-	log_printf("debug: userinit(): process pde = 0x%x\n", p->pgdir);
+	printk("debug: userinit(): process pde = 0x%x\n", p->pgdir);
 	char *mem = kpagealloc(1);
 	kmap(p->pgdir, mem, (void *) 0x0);
 	p->sz = PAGE_SZ;
@@ -153,7 +153,7 @@ userinit()
 	// Create 2nd usr proc
 	p = allocproc();
 	p->pgdir = setupvm();
-	log_printf("debug: userinit(): process2 pde = 0x%x\n", p->pgdir);
+	printk("debug: userinit(): process2 pde = 0x%x\n", p->pgdir);
 	mem = kpagealloc(1);
 	kmap(p->pgdir, mem, (void *) 0x00);
 	p->sz = PAGE_SZ;

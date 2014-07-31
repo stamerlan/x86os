@@ -4,7 +4,7 @@
 
 #include <x86os/types.h>
 #include <x86os/spinlock.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/mm/mm.h>
 #include <x86os/block/blk-dev.h>
 #include <x86os/block/buf.h>
@@ -81,9 +81,9 @@ do_blkread(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC
-		log_printf("panic: do_blkread: buf isn't busy\n");
+		printk("panic: do_blkread: buf isn't busy\n");
 	if (b->flags & B_VALID) {
-		log_printf("debug: do_blkread: nothing to do\n");
+		printk("debug: do_blkread: nothing to do\n");
 		return;
 	}
 
@@ -110,9 +110,9 @@ do_blkwrite(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC
-		log_printf("panic: do_blkwrite: buf isn't busy\n");
+		printk("panic: do_blkwrite: buf isn't busy\n");
 	if (!(b->flags & B_DIRTY)) {
-		log_printf("debug: do_blkwrite: nothing to do\n");
+		printk("debug: do_blkwrite: nothing to do\n");
 		return;
 	}
 

@@ -4,7 +4,7 @@
  * Test filesystem driver
  */
 
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/errno.h>
 #include <x86os/string.h>
 #include <x86os/fs/filesystems.h>
@@ -40,8 +40,8 @@ read(struct fs_node *node, char *buf, size_t count)
 static struct fs_node *
 lookup(struct fs_node *node, const char *entry)
 {
-	log_printf("debug: testfs: lookup: node = %d, entry = %s\n",
-		   (int) node->data, entry);
+	printk("debug: testfs: lookup: node = %d, entry = %s\n",
+	       (int) node->data, entry);
 
 	if ((int) node->data != 1)
 		return NULL;
@@ -55,7 +55,7 @@ lookup(struct fs_node *node, const char *entry)
 static struct fs_node *
 get_root(dev_t dev)
 {
-	log_printf("testfs: get_root on %d\n", dev);
+	printk("testfs: get_root on %d\n", dev);
 
 	return &fs[0];
 }

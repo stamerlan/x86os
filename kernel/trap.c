@@ -6,7 +6,7 @@
 #include <x86os/trap.h>
 #include <x86os/asm.h>
 #include <x86os/i8259.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/proc.h>
 
 static struct gatedesc idt[256];
@@ -40,6 +40,6 @@ trap(struct trapframe *tf)
 		outb(0xe9, 'B');
 		break;
 	default:
-		log_printf("unhandled trap 0x%x\n", tf->trapno);
+		printk("unhandled trap 0x%x\n", tf->trapno);
 	}
 }

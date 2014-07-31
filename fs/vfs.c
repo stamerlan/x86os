@@ -5,7 +5,7 @@
 
 #include <x86os/types.h>
 #include <x86os/errno.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/fs/node.h>
 #include <x86os/fs/filesystems.h>
 #include <x86os/fs/nname.h>
@@ -25,15 +25,15 @@ mount_root(dev_t root_dev)
 	for (i = 0; i < NR_FILESYSTEMS; i++) {
 		root = filesystems[i]->get_root(root_dev);
 		if (root) {
-			log_printf("vfs: root fs mounted (%s filesystem)\n",
-				   filesystems[i]->name);
-			log_printf("debug: root = %d\n", (int) root->data);
+			printk("vfs: root fs mounted (%s filesystem)\n",
+			       filesystems[i]->name);
+			printk("debug: root = %d\n", (int) root->data);
 			return;
 		}
 	}
 
 	// PANIC!!!
-	log_printf("panic: vfs: can not mount root\n");
+	printk("panic: vfs: can not mount root\n");
 	return;
 }
 

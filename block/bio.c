@@ -24,7 +24,7 @@
 #include <x86os/config.h>
 #include <x86os/spinlock.h>
 #include <x86os/types.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/proc.h>
 #include <x86os/block/buf.h>
 #include <x86os/block/blk-dev.h>
@@ -46,7 +46,7 @@ binit()
 	p = kmalloc(sizeof (struct buf));
 	if (!p) {
 		// PANIC
-		log_printf("panic: binit\n");
+		printk("panic: binit\n");
 		return;
 	}
 	p->next = NULL;
@@ -60,7 +60,7 @@ binit()
 		p = kmalloc(sizeof (struct buf));
 		if (!p) {
 			// PANIC
-			log_printf("panic: binit\n");
+			printk("panic: binit\n");
 			return;
 		}
 
@@ -111,7 +111,7 @@ bget(dev_t dev, sector_t sector)
 	}
 
 	// PANIC
-	log_printf("panic: no buffers\n");
+	printk("panic: no buffers\n");
 	return NULL;
 }
 
@@ -135,7 +135,7 @@ bwrite(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC
-		log_printf("panic: bwrite non-busy buf\n");
+		printk("panic: bwrite non-busy buf\n");
 
 	buf->flags |= B_DIRTY;
 	// TODO: ioscheduler
@@ -148,7 +148,7 @@ brelease(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC
-		log_printf("panic: brelease\n");
+		printk("panic: brelease\n");
 
 	acquire(&bcache.lock);
 	buf->flags &= ~B_BUSY;

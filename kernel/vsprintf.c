@@ -8,12 +8,13 @@
 
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
-static int skip_atoi(const char **s)
+static int
+skip_atoi(const char **s)
 {
-	int i=0;
+	int i = 0;
 
 	while (is_digit(**s))
-		i = i*10 + *((*s)++) - '0';
+		i = i * 10 + *((*s)++) - '0';
 	return i;
 }
 
@@ -22,73 +23,89 @@ static int skip_atoi(const char **s)
 #define PLUS	4		/* show plus */
 #define SPACE	8		/* space if plus */
 #define LEFT	16		/* left justified */
-#define SMALL	64		/* use 'abcdef' instead of 'ABCDEF' */
+#define SMALL	32		/* use 'abcdef' instead of 'ABCDEF' */
 
-static char* number(char* str, int num, int base, int size, int type)
+static char *
+number(char *str, int num, int base, int size, int type)
 {
-	char c,sign,tmp[36];
-	const char *digits="0123456789ABCDEF";
+	char c, sign, tmp[16];
+	const char *digits = "0123456789ABCDEF";
 	int i;
 
-	if (type&SMALL) digits="0123456789abcdef";
-	if (type&LEFT) type &= ~ZEROPAD;
-	if (base<2 || base>36)
+	if (type & SMALL)
+		digits = "0123456789abcdef";
+	if (type & LEFT)
+		type &= ~ZEROPAD;
+	if (base < 2 || base > 16)
 		return 0;
-	c = (type & ZEROPAD) ? '0' : ' ' ;
-	if (type&SIGN && num<0) {
-		sign='-';
+	c = (type & ZEROPAD) ? '0' : ' ';
+	if (type & SIGN && num < 0) {
+		sign = '-';
 		num = -num;
 	} else
-		sign=(type&PLUS) ? '+' : ((type&SPACE) ? ' ' : 0);
-	if (sign) size--;
-	i=0;
-	if (num==0)
-		tmp[i++]='0';
-	else while (num!=0)
-		tmp[i++]= num / base;
-	if (!(type&(ZEROPAD+LEFT)))
-		while(size-->0)
+		sign = (type & PLUS) ? '+' : ((type & SPACE) ? ' ' : 0);
+	if (sign)
+		size--;
+	i = 0;
+	if (num == 0)
+		tmp[i++] = '0';
+	else
+		while (num != 0) {
+			tmp[i++] = digits[num % base];
+			num = num / base;
+		}
+	if (!(type & (ZEROPAD + LEFT)))
+		while (size-- > 0)
 			*str++ = ' ';
 	if (sign)
 		*str++ = sign;
-	if (!(type&LEFT))
-		while(size-->0)
+	if (!(type & LEFT))
+		while (size-- > 0)
 			*str++ = c;
-	while(i-->0)
+	while (i-- > 0)
 		*str++ = tmp[i];
-	while(size-->0)
+	while (size-- > 0)
 		*str++ = ' ';
 	return str;
 }
 
-int vsprintf(char *buf, const char *fmt, va_list args)
+int
+vsprintf(char *buf, const char *fmt, va_list args)
 {
 	int len;
 	int i;
-	char* str;
-	char* s;
-	int* ip;
+	char *str;
+	char *s;
+	int *ip;
 
 	int flags;		/* flags to number() */
 	int field_width;	/* width of output field */
 
-	for (str=buf ; *fmt ; ++fmt) {
+	for (str = buf; *fmt; ++fmt) {
 		if (*fmt != '%') {
 			*str++ = *fmt;
 			continue;
 		}
-			
+
 		/* process flags */
 		flags = 0;
-		repeat:
-			++fmt;		/* this also skips first '%' */
-			switch (*fmt) {
-				case '-': flags |= LEFT; goto repeat;
-				case '+': flags |= PLUS; goto repeat;
-				case ' ': flags |= SPACE; goto repeat;
-				case '0': flags |= ZEROPAD; goto repeat;
-				}
-		
+	      repeat:
+		++fmt;		/* this also skips first '%' */
+		switch (*fmt) {
+		case '-':
+			flags |= LEFT;
+			goto repeat;
+		case '+':
+			flags |= PLUS;
+			goto repeat;
+		case ' ':
+			flags |= SPACE;
+			goto repeat;
+		case '0':
+			flags |= ZEROPAD;
+			goto repeat;
+		}
+
 		/* get field width */
 		field_width = -1;
 		if (is_digit(*fmt))
@@ -131,21 +148,21 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				flags |= ZEROPAD;
 			}
 			str = number(str,
-				(unsigned long) va_arg(args, void *), 16,
-				field_width, flags);
+				     (unsigned long) va_arg(args, void *), 16,
+				     field_width, flags);
 			break;
 
 		case 'x':
 			flags |= SMALL;
 		case 'X':
 			str = number(str, va_arg(args, unsigned long), 16,
-				field_width, flags);
+				     field_width, flags);
 			break;
 
 		case 'd':
 		case 'u':
 			str = number(str, va_arg(args, unsigned long), 10,
-				field_width, flags);
+				     field_width, flags);
 			break;
 
 		default:
@@ -159,5 +176,5 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 		}
 	}
 	*str = '\0';
-	return str-buf;
+	return str - buf;
 }

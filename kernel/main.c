@@ -2,7 +2,7 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/mm/mm.h>
 #include <x86os/i8259.h>
 #include <x86os/trap.h>
@@ -31,7 +31,7 @@ kmain(long magic, void *mbi)
 	mount_root(1);
 	char buf[64];
 	sys_read("/test", buf, 64);
-	log_printf("debug: read from fs: %s\n", buf);
+	printk("debug: read from fs: %s\n", buf);
 
 	scheduler();
 

@@ -3,7 +3,7 @@
  */
 
 #include <x86os/asm.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 #include <x86os/config.h>
 #include <x86os/proc.h>
 #include <x86os/x86.h>
@@ -62,7 +62,7 @@ kmalloc(size_t sz)
 
 	if (free + sz > max_mem) {
 		// PANIC!!!
-		log_printf("panic: kpagealloc");
+		printk("panic: kpagealloc");
 		return NULL;
 	}
 
@@ -79,7 +79,7 @@ kpagealloc(size_t pages)
 	    ((uint32_t) (free + (PAGE_SZ - 1)) & ~(PAGE_SZ - 1));
 	if (new_free + (pages * PAGE_SZ) > max_mem) {
 		// PANIC!!!
-		log_printf("panic: kpagealloc");
+		printk("panic: kpagealloc");
 		return NULL;
 	}
 
@@ -97,8 +97,8 @@ setupvm()
 	struct pde *pde = kpagealloc(1);
 	struct pte *pte = kpagealloc(1024);
 
-	log_printf("debug: setupvm(): pde = 0x%x, pte = 0x%x\n",
-		   (uint32_t) pde, (uint32_t) pte);
+	printk("debug: setupvm(): pde = 0x%x, pte = 0x%x\n",
+	       (uint32_t) pde, (uint32_t) pte);
 
 	for (i = 0; i < 1024; i++) {
 		pde[i] = PDE(&pte[i * 1024]);

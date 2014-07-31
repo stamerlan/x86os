@@ -3,7 +3,7 @@
  */
 
 #include <x86os/asm.h>
-#include <x86os/log.h>
+#include <x86os/printk.h>
 
 static int ncli = 0;
 
@@ -19,7 +19,7 @@ void
 popcli()
 {
 	if (--ncli < 0)
-		log_printf("panic: popcli()\n");
+		printk("panic: popcli()\n");
 	if (ncli == 0)
 		sti();
 }
