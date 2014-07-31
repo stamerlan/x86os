@@ -7,8 +7,7 @@
 
 #include <x86os/types.h>
 
-struct spinlock
-{
+struct spinlock {
 	uint32_t locked;
 };
 
@@ -19,5 +18,4 @@ void spin_unlock(struct spinlock *lock);
 #define __SPIN_LOCK_INIT_UNLOCKED(name)	{ 0 }
 #define __SPIN_LOCK_INIT_LOCKED(name)	{ 1 }
 
-#endif /* SPINLOCK_H */
-
+#endif				/* SPINLOCK_H */

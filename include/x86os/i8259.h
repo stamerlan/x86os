@@ -17,5 +17,4 @@
 void pic_init();
 void pic_enable(int irq);
 
-#endif /* I8259_H */
-
+#endif				/* I8259_H */

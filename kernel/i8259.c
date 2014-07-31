@@ -17,28 +17,24 @@
  */
 static uint16_t irqmask = 0xFFFF & ~(1 << IRQ_SLAVE);
 
-static void
-pic_setmask(uint16_t mask)
+static void pic_setmask(uint16_t mask)
 {
 	irqmask = mask;
 	outb(IO_PIC1 + 1, mask);
 	outb(IO_PIC2 + 1, mask >> 8);
 }
 
-void
-pic_enable(int irq)
+void pic_enable(int irq)
 {
 	pic_setmask(irqmask & ~(1 << irq));
 }
 
-void
-pic_disable(int irq)
+void pic_disable(int irq)
 {
 	pic_setmask(irqmask | (1 << irq));
 }
 
-void
-pic_init()
+void pic_init()
 {
 	// mask all interrupts
 	outb(IO_PIC1 + 1, 0xFF);

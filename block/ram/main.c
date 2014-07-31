@@ -16,8 +16,7 @@
 static dev_t disk_dev;
 static char *disk_data;
 
-static int
-read(struct buf *buf)
+static int read(struct buf *buf)
 {
 	if (buf->sector > DISK_SECT)
 		return -EFAULT;
@@ -27,8 +26,7 @@ read(struct buf *buf)
 	return 0;
 }
 
-static int
-write(struct buf *buf)
+static int write(struct buf *buf)
 {
 	return -EFAULT;
 }
@@ -38,8 +36,7 @@ static struct block_device_operations ops = {
 	.write = write,
 };
 
-void
-init_ramdrv()
+void init_ramdrv()
 {
 	disk_data = kmalloc(DISK_SIZE);
 	if (!disk_data)

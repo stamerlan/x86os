@@ -12,5 +12,4 @@ void binit();
 struct buf *bread(dev_t dev, sector_t sector);
 void bwrite(struct buf *buf);
 
-#endif /* BIO_H */
-
+#endif				/* BIO_H */

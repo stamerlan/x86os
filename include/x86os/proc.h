@@ -15,8 +15,7 @@
 
 #define suser() (current->uid == 0)
 
-struct context
-{
+struct context {
 	uint32_t edi;
 	uint32_t esi;
 	uint32_t ebx;
@@ -30,15 +29,14 @@ struct context
 #define TASK_SLEEPING	3
 
 // Per-process state
-struct task_struct
-{
-	size_t sz;			// size of process memory (bytes)
-	struct pde* pgdir;		// page table
-	char *kstack;			// bottom of kstack for this process
+struct task_struct {
+	size_t sz;		// size of process memory (bytes)
+	struct pde *pgdir;	// page table
+	char *kstack;		// bottom of kstack for this process
 	int state;
 	int exit_code, exit_signal;
-	int pid;			// process ID
-	struct trapframe *tf;		// trap frame for current syscall
+	int pid;		// process ID
+	struct trapframe *tf;	// trap frame for current syscall
 	struct context *context;	// swtch() here to run process
 	int errno;
 	uid_t uid;
@@ -48,8 +46,7 @@ struct task_struct
 };
 
 // TSS format
-struct tss_struct
-{
+struct tss_struct {
 	uint32_t link;		// old ts selector
 	uint32_t esp0;		// kstack ptr and selector
 	uint16_t ss0;
@@ -97,5 +94,4 @@ void yield(int task_state);
 
 extern struct task_struct *current;
 
-#endif /* PROC_H */
-
+#endif				/* PROC_H */

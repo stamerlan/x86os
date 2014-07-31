@@ -12,8 +12,7 @@
 // TODO: may be move it to vfs.c?
 extern struct fs_node *root;
 
-struct fs_node *
-get_node(const char *filename)
+struct fs_node *get_node(const char *filename)
 {
 	struct fs_node *base;
 	size_t i, p, namelen;
@@ -51,7 +50,7 @@ get_node(const char *filename)
 		path[i] = '\0';
 		log_printf("debug: get_node: path = %s, lookup addr = 0x%x, "
 			   "base = %d\n", &path[p], &base->op->lookup,
-			   (int) base->data);
+			   (int)base->data);
 		base = base->op->lookup(base, &path[p]);
 		if (!base)
 			return NULL;

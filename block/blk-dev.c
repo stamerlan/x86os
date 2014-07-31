@@ -26,8 +26,7 @@ static struct {
 /* Returns device number
  * TODO: Handle dev_t overflow
  */
-static dev_t
-alloc_devnr()
+static dev_t alloc_devnr()
 {
 	static dev_t nr = 1;
 
@@ -37,10 +36,9 @@ alloc_devnr()
 /* Registers block device
  * TODO: Multiple devices registration at once
  */
-dev_t
-register_blkdev(struct block_device_operations * ops)
+dev_t register_blkdev(struct block_device_operations * ops)
 {
-	struct block_device *p = kmalloc(sizeof (struct block_device));
+	struct block_device *p = kmalloc(sizeof(struct block_device));
 	if (!p)
 		return 0;
 	p->dev = alloc_devnr();
@@ -57,8 +55,7 @@ register_blkdev(struct block_device_operations * ops)
 	return p->dev;
 }
 
-void
-unregister_blkdev(dev_t dev)
+void unregister_blkdev(dev_t dev)
 {
 	spin_lock(&blkdev_table.lock);
 	struct block_device *p;
@@ -71,15 +68,14 @@ unregister_blkdev(dev_t dev)
 			goto out;
 		}
 	}
-out:
+ out:
 	spin_unlock(&blkdev_table.lock);
 }
 
 /* If B_VALID isn't set, invoke read function, set B_VALID
  * NOTE: Buffer must be busy
  */
-void
-do_blkread(struct buf *b)
+void do_blkread(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC
@@ -108,8 +104,7 @@ do_blkread(struct buf *b)
 /* If B_DIRTY is set, invoke write function, set B_VALID and reset B_DIRTY
  * NOTE: Buffer must be busy
  */
-void
-do_blkwrite(struct buf *b)
+void do_blkwrite(struct buf *b)
 {
 	if (!(b->flags & B_BUSY))
 		// PANIC

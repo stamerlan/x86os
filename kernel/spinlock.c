@@ -14,15 +14,13 @@ void spin_lock_init(struct spinlock *lock)
 /* Acquire a spin lock, spin waiting if it is not available 
  * TODO: is a lot of time addr bus locked?
  */
-void
-spin_lock(struct spinlock *lock)
+void spin_lock(struct spinlock *lock)
 {
 	while (xchg(&lock->locked, 1) != 0) ;
 }
 
 /* Release a spin lock */
-void
-spin_unlock(struct spinlock *lock)
+void spin_unlock(struct spinlock *lock)
 {
 	xchg(&lock->locked, 0);
 }

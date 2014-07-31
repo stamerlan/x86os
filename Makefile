@@ -23,7 +23,7 @@ BOCHS		= /opt/bochs/bin/bochs
 QEMUOPTS	= -smp 1 -m 32
 BOCHSCONF	= bochs.conf
 
-INDENT_PARAM	= -kr -i8 -ts8 -sob -l80 -ss -bs -psl
+INDENT_PARAM	= -linux
 
 # TODO: What about ldscript?
 # TODO: $(STRIP) -s $(KERNELFILE)
@@ -47,7 +47,7 @@ bochs:	img
 	$(BOCHS) -f $(BOCHSCONF) -q
 
 precommit:
-	indent $(INDENT_PARAM) `find . -name "*.c"`
+	indent $(INDENT_PARAM) `find . -name "*.[ch]"`
 
 ctags:
 	ctags -R
@@ -55,6 +55,7 @@ ctags:
 clean:
 	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i clean; done
 	rm -f $(KERNELFILE)
+	rm -f `find . -name ".h~"`
 
 distclean:	clean
 	rm -f $(IMG) System.map tags

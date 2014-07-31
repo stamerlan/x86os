@@ -11,7 +11,7 @@
 #include <x86os/proc.h>
 
 struct __wait_queue_head {
-	struct spinlock	lock;
+	struct spinlock lock;
 	struct list_head task_list;
 };
 
@@ -29,9 +29,8 @@ typedef struct __wait_queue_head wait_queue_head_t;
 #define DECLARE_WAIT_QUEUE_HEAD(name) \
 	wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)
 
-void init_waitqueue_head(wait_queue_head_t *q);
-void wait(wait_queue_head_t *q, struct spinlock *lock);
-void wakeup(wait_queue_head_t *q);
+void init_waitqueue_head(wait_queue_head_t * q);
+void wait(wait_queue_head_t * q, struct spinlock *lock);
+void wakeup(wait_queue_head_t * q);
 
-#endif /* WAIT_QUEUE_H */
-
+#endif				/* WAIT_QUEUE_H */

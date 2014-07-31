@@ -2,7 +2,7 @@
  * Author: Vlad Vovchenko <vlad.vovchenko93@gmail.com>
  */
 
-#ifndef FS_H 
+#ifndef FS_H
 #define FS_H
 
 #include <x86os/types.h>
@@ -13,5 +13,4 @@ ssize_t sys_read(const char *filename, char *buf, size_t count);
 ssize_t sys_write(const char *filename, char *buf, size_t count);
 int sys_close(const char *filename);
 
-#endif /* FS_H */
-
+#endif				/* FS_H */

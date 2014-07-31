@@ -11,15 +11,13 @@
 #include <x86os/asm.h>
 
 // Char to bochs debagger
-static void
-kputc(char c)
+static void kputc(char c)
 {
 	outb(0xe9, c);
 }
 
 // Print string to log
-void
-log_puts(char *s)
+void log_puts(char *s)
 {
 	char *p = s;
 	while (*p != '\0') {
@@ -31,8 +29,7 @@ log_puts(char *s)
 /* Format and print string to log
  * NOTE: supported formats: %d, %u, %x, %s, %c
  */
-void
-log_printf(char *fmt, ...)
+void log_printf(char *fmt, ...)
 {
 	char c;			// current symbol in fmt
 	signed int d;		// signed number
@@ -87,7 +84,7 @@ log_printf(char *fmt, ...)
 
 			if (s == NULL) {
 				// Convert u to string
-				s = ascii + sizeof (ascii) - 1;
+				s = ascii + sizeof(ascii) - 1;
 				*s = 0;
 				do {
 					*--s = x2c[u % base];

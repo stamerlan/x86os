@@ -8,24 +8,22 @@
 #include <x86os/types.h>
 
 // Gate descriptors for interrupts and traps
-struct gatedesc
-{
-	uint32_t ofs_15_0 : 16;		// low 16 bits of offset in segment
-	uint32_t cs : 16;		// code segment selector
-	uint32_t args : 5;		// # args, 0 for int/trap gates
-	uint32_t rsv : 3;		// reserved
+struct gatedesc {
+	uint32_t ofs_15_0:16;	// low 16 bits of offset in segment
+	uint32_t cs:16;		// code segment selector
+	uint32_t args:5;	// # args, 0 for int/trap gates
+	uint32_t rsv:3;		// reserved
 	/* Sysyem segment type bits
 	 * TODO: Use define instead
 	 */
-	enum 
-	{
-		STS_IG32 = 0xE,		// 32-bit int gate
-		STS_TG32 = 0xF,		// 32-bit trap gate
-	} type : 4;
-	uint32_t s : 1;			// must be 0 (system)
-	enum dpl_t dpl : 2;		// descr (meaning new) privilege lvl
-	uint32_t p : 1;			// present
-	uint32_t ofs_31_16 : 16;	// high bits of offset in segment
+	enum {
+		STS_IG32 = 0xE,	// 32-bit int gate
+		STS_TG32 = 0xF,	// 32-bit trap gate
+	} type:4;
+	uint32_t s:1;		// must be 0 (system)
+	enum dpl_t dpl:2;	// descr (meaning new) privilege lvl
+	uint32_t p:1;		// present
+	uint32_t ofs_31_16:16;	// high bits of offset in segment
 };
 
 /* Set up a normal interrupt/trap gate descriptor.
@@ -53,8 +51,7 @@ struct gatedesc
 /* Layout of the trap frame built on the stack by the hardware and by 
  * trapasm.S, and passed to trap().
  */
-struct trapframe
-{
+struct trapframe {
 	// pusha
 	uint32_t edi;
 	uint32_t esi;
@@ -106,7 +103,7 @@ struct trapframe
 #define T_SS		12	// Stack Segment Fault
 #define T_GP		13	// General Protection
 #define T_PF		14	// Page Fault
-//			15	// Reserved
+//                      15      // Reserved
 #define T_MF		16	// Floating-Point Error (Math Fault)
 #define T_AC		17	// Alignment Check
 #define T_MC		18	// Machine Check
@@ -117,5 +114,4 @@ struct trapframe
 
 void idt_init();
 
-#endif /* TRAP_H */
-
+#endif				/* TRAP_H */

@@ -21,5 +21,4 @@
 /* Max path len */
 #define MAX_PATH	255
 
-#endif /* CONFIG_H */
-
+#endif				/* CONFIG_H */

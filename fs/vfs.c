@@ -17,8 +17,7 @@ extern struct file_system_type testfs;
 struct fs_node *root;
 static struct file_system_type *filesystems[NR_FILESYSTEMS] = { &testfs };
 
-void
-mount_root(dev_t root_dev)
+void mount_root(dev_t root_dev)
 {
 	size_t i;
 
@@ -27,7 +26,7 @@ mount_root(dev_t root_dev)
 		if (root) {
 			log_printf("vfs: root fs mounted (%s filesystem)\n",
 				   filesystems[i]->name);
-			log_printf("debug: root = %d\n", (int) root->data);
+			log_printf("debug: root = %d\n", (int)root->data);
 			return;
 		}
 	}
@@ -37,8 +36,7 @@ mount_root(dev_t root_dev)
 	return;
 }
 
-int
-sys_open(const char *filename, int flags, mode_t mode)
+int sys_open(const char *filename, int flags, mode_t mode)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -48,8 +46,7 @@ sys_open(const char *filename, int flags, mode_t mode)
 	return node->op->open(node, flags, mode);
 }
 
-ssize_t
-sys_read(const char *filename, char *buf, size_t count)
+ssize_t sys_read(const char *filename, char *buf, size_t count)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -59,8 +56,7 @@ sys_read(const char *filename, char *buf, size_t count)
 	return node->op->read(node, buf, count);
 }
 
-ssize_t
-sys_write(const char *filename, char *buf, size_t count)
+ssize_t sys_write(const char *filename, char *buf, size_t count)
 {
 	struct fs_node *node = get_node(filename);
 
@@ -70,8 +66,7 @@ sys_write(const char *filename, char *buf, size_t count)
 	return node->op->write(node, buf, count);
 }
 
-int
-sys_close(const char *filename)
+int sys_close(const char *filename)
 {
 	struct fs_node *node = get_node(filename);
 

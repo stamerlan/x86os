@@ -9,5 +9,4 @@
 
 struct fs_node *get_node(const char *filename);
 
-#endif /* NNAME_H */
-
+#endif				/* NNAME_H */

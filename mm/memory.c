@@ -16,11 +16,10 @@ static struct segdesc gdt[NR_SEGS];
 static struct tss_struct ts;
 
 static struct pde *kpde;
-static char *free = (char *) 0x200000;
-const char *max_mem = (char *) 0x2000000;	// 32 MB
+static char *free = (char *)0x200000;
+const char *max_mem = (char *)0x2000000;	// 32 MB
 
-void
-mm_init()
+void mm_init()
 {
 	// Setup segments
 	gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_SYS);
@@ -28,7 +27,7 @@ mm_init()
 	gdt[SEG_UCODE] = SEG(STA_X | STA_R, 0, 0xFFFFFFFF, DPL_USR);
 	gdt[SEG_UDATA] = SEG(STA_W, 0, 0xFFFFFFFF, DPL_USR);
 
-	lgdt(gdt, sizeof (gdt));
+	lgdt(gdt, sizeof(gdt));
 	set_cs(SEG_KCODE << 3);
 	set_ds(SEG_KDATA << 3);
 	set_gs(SEG_KDATA << 3);
@@ -56,8 +55,7 @@ mm_init()
 	 */
 }
 
-void *
-kmalloc(size_t sz)
+void *kmalloc(size_t sz)
 {
 
 	if (free + sz > max_mem) {
@@ -72,8 +70,7 @@ kmalloc(size_t sz)
 	return addr;
 }
 
-void *
-kpagealloc(size_t pages)
+void *kpagealloc(size_t pages)
 {
 	char *new_free = (char *)
 	    ((uint32_t) (free + (PAGE_SZ - 1)) & ~(PAGE_SZ - 1));
@@ -88,8 +85,7 @@ kpagealloc(size_t pages)
 }
 
 // setups VM
-struct pde *
-setupvm()
+struct pde *setupvm()
 {
 	size_t i;
 	void *phys = 0;
@@ -111,20 +107,17 @@ setupvm()
 
 // NOTO: addr should be 4KB-aligned
 // TODO: assumed pte placed one after the other 
-void
-kmap(struct pde *pde, void *phys, void *virt)
+void kmap(struct pde *pde, void *phys, void *virt)
 {
-	struct pte *pte = (struct pte *) (pde->pte << 12);
+	struct pte *pte = (struct pte *)(pde->pte << 12);
 	pte[(uint32_t) virt >> 12] = PTE(phys);
 }
 
 // Switch TSS and page table to correspond to process p.
-void
-switchvm(struct task_struct *p)
+void switchvm(struct task_struct *p)
 {
 	pushcli();
-	gdt[SEG_TSS] = SEG16(STS_T32A, &ts,
-			     sizeof (struct tss_struct), DPL_SYS);
+	gdt[SEG_TSS] = SEG16(STS_T32A, &ts, sizeof(struct tss_struct), DPL_SYS);
 	gdt[SEG_TSS].s = 0;
 	ts.ss0 = SEG_KDATA << 3;
 	ts.esp0 = (uint32_t) p->kstack + KSTACK_SZ;
@@ -134,8 +127,7 @@ switchvm(struct task_struct *p)
 }
 
 // Switch page table register to the kernel page table
-void
-switchkvm()
+void switchkvm()
 {
 	wcr3((uint32_t) kpde);
 }

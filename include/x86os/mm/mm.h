@@ -17,5 +17,4 @@ void kmap(struct pde *pde, void *phys, void *virt);
 void switchvm(struct task_struct *p);
 void switchkvm();
 
-#endif /* MM_H */
-
+#endif				/* MM_H */

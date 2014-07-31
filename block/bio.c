@@ -40,8 +40,7 @@ static struct {
 
 static DECLARE_WAIT_QUEUE_HEAD(bwait);
 
-void
-binit()
+void binit()
 {
 	size_t i;
 	struct buf *p;
@@ -49,7 +48,7 @@ binit()
 	INIT_LIST_HEAD(&bcache.head);
 
 	// TODO: Flag MEM_FS
-	p = kmalloc(sizeof (struct buf));
+	p = kmalloc(sizeof(struct buf));
 	if (!p) {
 		// PANIC
 		log_printf("panic: binit\n");
@@ -61,7 +60,7 @@ binit()
 
 	for (i = 0; i < NR_BUF; i++) {
 		// TODO: Flag MEM_FS
-		p = kmalloc(sizeof (struct buf));
+		p = kmalloc(sizeof(struct buf));
 		if (!p) {
 			// PANIC
 			log_printf("panic: binit\n");
@@ -76,14 +75,13 @@ binit()
 /* Look throught bcache for sector on dev. If not found, allocate new block. 
  * In any case, return B_BUSY buffer
  */
-static struct buf *
-bget(dev_t dev, sector_t sector)
+static struct buf *bget(dev_t dev, sector_t sector)
 {
 	struct buf *p;
 
 	spin_lock(&bcache.lock);
 
-	for(;;) {
+	for (;;) {
 		// Is the sector already cached?
 		list_for_each_entry(p, &bcache.head, bufs) {
 			if (p->dev == dev && p->sector == sector) {
@@ -118,8 +116,7 @@ bget(dev_t dev, sector_t sector)
 }
 
 // Return a B_BUSY buf with the contents of the indicated disk sector
-struct buf *
-bread(dev_t dev, sector_t sector)
+struct buf *bread(dev_t dev, sector_t sector)
 {
 	struct buf *p;
 
@@ -132,8 +129,7 @@ bread(dev_t dev, sector_t sector)
 }
 
 // Writes buf contents to disk. Must be B_BUSY
-void
-bwrite(struct buf *buf)
+void bwrite(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC
@@ -145,8 +141,7 @@ bwrite(struct buf *buf)
 }
 
 // Release a B_BUSY buffer
-void
-brelease(struct buf *buf)
+void brelease(struct buf *buf)
 {
 	if (!(buf->flags & B_BUSY))
 		// PANIC

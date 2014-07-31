@@ -9,15 +9,13 @@
 #include <x86os/spinlock.h>
 #include <x86os/mm/mm.h>
 
-void wait(wait_queue_head_t *q, struct spinlock *lock)
+void wait(wait_queue_head_t * q, struct spinlock *lock)
 {
 	struct __wait_queue *w = kmalloc(sizeof(struct __wait_queue));
-	if (!w)
-	{
+	if (!w) {
 		// PANIC!!!
 		return;
 	}
-
 
 	spin_lock(&q->lock);
 	list_add_tail(&q->task_list, &w->task_list);
@@ -30,20 +28,19 @@ void wait(wait_queue_head_t *q, struct spinlock *lock)
 	spin_lock(lock);
 }
 
-void wakeup(wait_queue_head_t *q)
+void wakeup(wait_queue_head_t * q)
 {
 	struct __wait_queue *p;
 
 	list_for_each_entry(p, &q->task_list, task_list)
-		p->task->state = TASK_RUNNABLE;
+	    p->task->state = TASK_RUNNABLE;
 	// TODO: IMPORTANT clear list
 
 	spin_unlock(&q->lock);
 }
 
-void init_waitqueue_head(wait_queue_head_t *q)
+void init_waitqueue_head(wait_queue_head_t * q)
 {
 	spin_lock_init(&q->lock);
 	INIT_LIST_HEAD(&q->task_list);
 }
-

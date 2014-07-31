@@ -45,4 +45,4 @@
 void pushcli();
 void popcli();
 
-#endif /* X86_H */
+#endif				/* X86_H */

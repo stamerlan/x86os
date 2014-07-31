@@ -33,5 +33,4 @@
 #define ELOOP		26	/* Too many symbolic links encountered */
 #define ENOMSG		27	/* No message of desired type */
 
-#endif /* ERRNO_H */
-
+#endif				/* ERRNO_H */

@@ -8,12 +8,10 @@
 #include <x86os/types.h>
 #include <x86os/fs/node.h>
 
-struct file_system_type
-{
+struct file_system_type {
 	char *name;
 
-	struct fs_node *(*get_root)(dev_t dev);
+	struct fs_node *(*get_root) (dev_t dev);
 };
 
-#endif /* FILESYSTEMS_H */
-
+#endif				/* FILESYSTEMS_H */
